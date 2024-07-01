@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "@discord-player/extractor": "^4.4.7",
+    "@discordjs/rest": "^2.3.0",
+    "@discordjs/voice": "^0.17.0",
+    "@vitalets/google-translate-api": "^9.2.0",
+    "discord-player": "^6.6.10",
+    "discord.js": "^14.15.3",
+    "ffmpeg": "^0.0.4",
+    "mediaplex": "^0.0.9",
+    "mongoose": "^8.4.4",
+    "node-fetch": "^2.7.0",
+    "ytdl-core": "^4.11.5"
+  },
+  "name": "src",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
