@@ -1,3 +1,8 @@
 {
-    
+  "token": "MTA4MjcxMTQ4NzgyODczNDAwMg.GdJxRq.l9TnFk7YqvPWWKTqtGKH4I3hvRcINhDR8FXalI",
+    "prefix": "..",
+    "clientId": "1082711487828734002",
+    "guildId": "1238911382725070848",
+    "giphyApiKey":"eMqjUcK3e9Cxrchqjg2V6mtlmj3FTS9d",
+    "mongodb": "mongodb+srv://Soldierocks:Notsold@cluster0.ejdx5.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 }
