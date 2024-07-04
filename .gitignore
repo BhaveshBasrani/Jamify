@@ -128,5 +128,8 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Ignore config, package-lock, and package files
 config.json
+package-lock.json
 package.json
