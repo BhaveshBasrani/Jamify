@@ -5,7 +5,8 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
 const { token, prefix, mongodb } = require('./config.json');
-const commandHandler = require('./handlers/commandHandler');
+const commandHandler = require('./handlers/commandHandler.js');
+const Queue = require('./models/queue.js')
 
 const client = new Client({
     intents: [
@@ -28,6 +29,18 @@ client.player = new Player(client, {
 // Register extractors
 client.player.extractors.register(YouTubeExtractor);
 client.player.extractors.register(SpotifyExtractor);
+
+client.player.on('error', (queue, error) => {
+    console.error(`Error emitted from the queue: ${error.message}`);
+});
+
+client.player.on('playerError', (queue, error) => {
+    console.error(`Error emitted from the player: ${error.message}`);
+});
+
+client.player.on('skip', (queue) => {
+    console.log(`Skipped the current song in guild ${queue.guild.id}`);
+});
 
 // Connect to MongoDB
 mongoose.connect(mongodb, {
@@ -69,5 +82,30 @@ for (const file of eventFiles) {
 
 // Invoke the command handler to log command information
 commandHandler(client);
+
+const restoreState = async (client, guildId) => {
+    const queueData = await Queue.findOne({ guildId });
+    if (queueData && queueData.currentTrack) {
+        let node = client.player.nodes.get(guildId);
+        if (!node) {
+            node = await client.player.nodes.create(guildId, {
+                metadata: {
+                    channel: client.channels.cache.get(queueData.currentTrack.channelId)
+                }
+            });
+            await node.connect(client.channels.cache.get(queueData.currentTrack.voiceChannelId));
+        }
+        await node.play(queueData.currentTrack.url);
+        queueData.songs.forEach(song => node.queue.add(song.url));
+    }
+};
+
+// Call restoreState for each guild the bot is in
+client.on('ready', async () => {
+    console.log(`Logged in as ${client.user.tag}!`);
+    client.guilds.cache.forEach(guild => {
+        restoreState(client, guild.id);
+    });
+});
 
 client.login(token);

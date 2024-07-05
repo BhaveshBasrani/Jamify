@@ -1,16 +1,36 @@
 const { EmbedBuilder } = require('discord.js');
-const { useQueue } = require("discord-player");
+const Queue = require('../../../models/queue.js'); // Adjust the path as needed
 
 module.exports = {
     name: 'skip',
     description: 'Skips the current song.',
     category: 'music',
     async execute(message) {
-        const queue = useQueue(message.guild.id);
+        const queue = await Queue.findOne({ guildId: message.guild.id });
 
-        if (!queue || !queue.tracks.length) return message.channel.send('No more songs in the queue!');
+        if (!queue || !queue.songs.length) {
+            return message.channel.send('No more songs in the queue!');
+        }
 
-        queue.node.skip();
+        const currentTrack = queue.songs.shift();
+        await queue.save();
+
+        let node = message.client.player.nodes.get(message.guild.id);
+        if (!node) {
+            return message.reply('No music is being played!');
+        }
+
+        if (queue.songs.length > 0) {
+            const nextTrack = queue.songs[0];
+            try {
+                await node.play(nextTrack.url);
+            } catch (error) {
+                console.error(error);
+                return message.reply('An error occurred while trying to play the next track.');
+            }
+        } else {
+            node.stop();
+        }
 
         const embed = new EmbedBuilder()
             .setTitle('Song Skipped')
