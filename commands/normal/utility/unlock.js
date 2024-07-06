@@ -1,13 +1,19 @@
+const { PermissionsBitField } = require("discord.js");
+
 module.exports = {
     name: 'unlock',
     description: 'Unlocks the current channel.',
     category: 'utility',
     execute(message) {
         console.log('Executing command: unlock');
-        if (!message.member.permissions.has('MANAGE_CHANNELS')) {
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageChannels)) {
             return message.reply('You do not have permissions to manage channels.');
         }
-        message.channel.permissionOverwrites.create(message.guild.id, { SEND_MESSAGES: true })
+
+        // Set the SEND_MESSAGES permission to true
+        message.channel.permissionOverwrites.create(message.guild.id, {
+            SEND_MESSAGES: true,
+        })
             .then(() => {
                 message.reply('Channel unlocked.');
                 console.log('Channel unlocked.');

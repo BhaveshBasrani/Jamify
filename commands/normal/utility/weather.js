@@ -17,7 +17,7 @@ module.exports = {
             const geoData = await geoResponse.json();
 
             if (!geoData.length) {
-                return message.reply('Unable to fetch coordinates for the specified location.');
+                return message.reply('Unable to fetch coordinates for the specified location. /nTry using only your city name');
             }
 
             const { lat, lon } = geoData[0];
@@ -31,8 +31,7 @@ module.exports = {
                 return message.reply('Unable to fetch weather for the specified location.');
             }
 
-            message.channel.send(`Current weather in ${location}:\nTemperature: ${weather.temperature}°C\nWeather: ${weather.weathercode}`);
-            console.log(`Fetched weather for ${location}`);
+            message.channel.send(`Current weather in ${location}:\nTemperature: ${weather.temperature}°C\nWindspeed: ${weather.windspeed}`);
         } catch (error) {
             console.error('Error fetching weather:', error);
             message.reply('There was an error trying to fetch the weather.');

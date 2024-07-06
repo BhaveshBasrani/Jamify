@@ -1,9 +1,10 @@
+const { PermissionsBitField } = require('discord.js');
 module.exports = {
     name: 'clear',
     description: 'Deletes a specified number of messages.',
     category: 'utility',
     execute(message, args) {
-        if (!message.member.permissions.has('MANAGE_MESSAGES')) {
+        if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
             return message.reply('You do not have permissions to manage messages.');
         }
         const amount = parseInt(args[0]);

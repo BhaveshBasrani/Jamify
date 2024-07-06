@@ -1,5 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
-const Queue = require('../../../models/queue.js'); // Adjust the path as needed
+const Queue = require('../../../models/queue.js');
+const { banner, logo, footer } = require('../../../config.json')
 
 module.exports = {
     name: 'removequeue',
@@ -22,10 +23,10 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setTitle('Song Removed from Queue')
-            .setImage('https://cdn.discordapp.com/attachments/1083025959659245578/1255924342836170782/standard.gif?ex=667ee631&is=667d94b1&hm=df73dbc902c6b853b57e7f324244e272bda2a84c471d7a2e567f698e68326e35&')
+            .setImage(banner)
             .setDescription(`${track.title} has been removed from the queue.`)
             .setColor('Red')
-            .setFooter({ text: '© 2024 Jamify All rights reserved.'});
+            .setFooter({ text: footer, iconURL: logo});
 
         message.channel.send({ embeds: [embed] });
     },

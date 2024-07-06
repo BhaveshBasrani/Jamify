@@ -1,10 +1,10 @@
-const { Client, GatewayIntentBits, Collection } = require('discord.js');
+const { Client, GatewayIntentBits, Collection, EmbedBuilder } = require('discord.js');
 const { Player } = require('discord-player');
 const { YouTubeExtractor, SpotifyExtractor } = require('@discord-player/extractor');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
-const { token, prefix, mongodb } = require('./config.json');
+const { token, mongodb, banner, logo, footer } = require('./config.json');
 const commandHandler = require('./handlers/commandHandler.js');
 const Queue = require('./models/queue.js')
 
@@ -30,11 +30,11 @@ client.player = new Player(client, {
 client.player.extractors.register(YouTubeExtractor);
 client.player.extractors.register(SpotifyExtractor);
 
-client.player.on('error', (queue, error) => {
+client.player.on('error', (error) => {
     console.error(`Error emitted from the queue: ${error.message}`);
 });
 
-client.player.on('playerError', (queue, error) => {
+client.player.on('playerError', (error) => {
     console.error(`Error emitted from the player: ${error.message}`);
 });
 
@@ -46,8 +46,8 @@ client.player.on('skip', (queue) => {
 mongoose.connect(mongodb, {
     authSource: 'admin', // Specify the authentication database if needed
 })
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('Failed to connect to MongoDB', err));
+   .then(() => console.log('Connected to MongoDB'))
+   .catch(err => console.error('Failed to connect to MongoDB', err));
 
 // Load normal commands
 const commandFolders = fs.readdirSync(path.join(__dirname, 'commands/normal'));
@@ -83,28 +83,82 @@ for (const file of eventFiles) {
 // Invoke the command handler to log command information
 commandHandler(client);
 
-const restoreState = async (client, guildId) => {
-    const queueData = await Queue.findOne({ guildId });
-    if (queueData && queueData.currentTrack) {
-        let node = client.player.nodes.get(guildId);
-        if (!node) {
+async function restoreState(guildId) {
+    let queueData;
+    try {
+        queueData = await Queue.findOne({ guildId: guildId });
+    } catch (error) {
+        console.error(`Failed to retrieve queue data for guild ${guildId}:`, error);
+        return;
+    }
+
+    if (!queueData || !queueData.songs.length) {
+        console.log(`No saved queue for guild ${guildId}`);
+        return;
+    }
+
+    let node = client.player.nodes.get(guildId);
+    if (!node) {
+        try {
             node = await client.player.nodes.create(guildId, {
                 metadata: {
-                    channel: client.channels.cache.get(queueData.currentTrack.channelId)
+                    channel: queueData.songs[0].channelId ? client.channels.cache.get(queueData.songs[0].channelId) : null
                 }
             });
-            await node.connect(client.channels.cache.get(queueData.currentTrack.voiceChannelId));
+            if (queueData.songs[0].voiceChannelId) {
+                await node.connect(client.channels.cache.get(queueData.songs[0].voiceChannelId));
+            }
+        } catch (error) {
+            console.error(`Failed to create or connect node for guild ${guildId}:`, error);
+            return;
         }
-        await node.play(queueData.currentTrack.url);
-        queueData.songs.forEach(song => node.queue.add(song.url));
     }
-};
+
+    if (!node.queue) {
+        node.queue = [];
+    }
+
+    queueData.songs.forEach(song => {
+        if (song.url) {
+            if (typeof node.queue.add === 'function') {
+                node.queue.add(song.url);
+            } else {
+                node.queue.push(song.url);
+            }
+        }
+    })
+
+    const firstSong = queueData.songs[0];
+    node.play(firstSong.url, {
+        metadata: {
+            requestedBy: firstSong.requestedBy,
+            channelId: firstSong.channelId,
+            voiceChannelId: firstSong.voiceChannelId
+        }
+    });
+
+    // Send the "now playing" embed
+    if (firstSong && firstSong.channelId && client.channels.cache.get(firstSong.channelId)) {
+        const nowPlayingEmbed = new EmbedBuilder()
+            .setTitle('Bot Has Been Restarted... \n*Queue Restored* \n**Now Playing**')
+            .setThumbnail(firstSong.thumbnail)
+            .setDescription(`**${firstSong.title}**`)
+            .setImage(banner)
+            .setURL(firstSong.url)
+            .setColor('Blue')
+            .setFooter({ text: footer, iconURL: logo });
+
+        client.channels.cache.get(firstSong.channelId).send({ embeds: [nowPlayingEmbed] });
+    }
+
+    console.log(`Restored queue for guild ${guildId}`);
+}
 
 // Call restoreState for each guild the bot is in
 client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     client.guilds.cache.forEach(guild => {
-        restoreState(client, guild.id);
+        restoreState(guild.id);
     });
 });
 

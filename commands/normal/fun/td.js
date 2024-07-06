@@ -1,5 +1,6 @@
 const { EmbedBuilder, MessageActionRow, MessageSelectMenu } = require('discord.js');
 const fetch = require('node-fetch');
+const { footer , logo} = require('../../../config.json')
 
 module.exports = {
     name: 'td',
@@ -10,7 +11,7 @@ module.exports = {
             .setTitle('Truth or Dare')
             .setDescription('Choose truth or dare from the menu below.')
             .setColor('Purple')
-            .setFooter({ iconURL: 'https://cdn.discordapp.com/attachments/1083025959659245578/1255924342836170782/standard.gif?ex=667ee631&is=667d94b1&hm=df73dbc902c6b853b57e7f324244e272bda2a84c471d7a2e567f698e68326e35&' })
+            .setFooter({ text: footer , iconURL: logo })
 
         const row = new MessageActionRow()
             .addComponents(
@@ -30,7 +31,7 @@ module.exports = {
                         },
                     ])
             )
-            .setFooter({ text: 'Daring..', iconURL: 'https://cdn.discordapp.com/attachments/1083025959659245578/1255924342836170782/standard.gif?ex=667ee631&is=667d94b1&hm=df73dbc902c6b853b57e7f324244e272bda2a84c471d7a2e567f698e68326e35&' });
+            .setFooter({ text: footer , iconURL: logo })
 
         const msg = await message.channel.send({ embeds: [embed], components: [row] });
 
@@ -44,7 +45,9 @@ module.exports = {
                 const truthEmbed = new EmbedBuilder()
                     .setTitle('Truth')
                     .setDescription(data.question)
-                    .setColor('Blue');
+                    .setColor('Blue')
+                    .setFooter({ text: footer , iconURL: logo });
+                    
                 await i.update({ embeds: [truthEmbed], components: [] });
             } else if (i.values[0] === 'dare') {
                 const response = await fetch('https://api.truthordarebot.xyz/api/dare');
@@ -52,7 +55,8 @@ module.exports = {
                 const dareEmbed = new EmbedBuilder()
                     .setTitle('Dare')
                     .setDescription(data.question)
-                    .setColor('Red');
+                    .setColor('Red')
+                    .setFooter({ text: footer , iconURL: logo });
                 await i.update({ embeds: [dareEmbed], components: [] });
             }
         });

@@ -1,5 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const { useQueue } = require('discord-player')
+const Queue = require('../../../models/queue.js')
 
 module.exports = {
     name: 'stop',
@@ -11,13 +12,14 @@ module.exports = {
             return message.reply('I am not currently playing music in this server.');
         }
         queue.delete();
+        await Queue.deleteOne({ guildId: message.guild.id });
 
         const embed = new EmbedBuilder()
             .setTitle('Music Stopped')
-            .setImage('https://cdn.discordapp.com/attachments/1083025959659245578/1255924342836170782/standard.gif?ex=667ee631&is=667d94b1&hm=df73dbc902c6b853b57e7f324244e272bda2a84c471d7a2e567f698e68326e35&')
+            .setImage(banner)
             .setDescription('The music has been stopped and the queue has been cleared.')
             .setColor('Red')
-            .setFooter({ text: '© 2024 Jamify All rights reserved.'});
+            .setFooter({ text: footer , iconURL: logo});
 
         message.channel.send({ embeds: [embed] });
     },
