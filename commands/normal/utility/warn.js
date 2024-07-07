@@ -1,7 +1,7 @@
 const { PermissionsBitField, EmbedBuilder } = require('discord.js');
 const GuildConfig = require('../../../models/guildConfig.js');
 const fetch = require('node-fetch');
-const { giphyk } = require('../../../config.json');
+const { giphyk, logo, footer } = require('../../../config.json');
 
 module.exports = {
     name: 'warn',
@@ -34,7 +34,7 @@ module.exports = {
             return message.reply('Log channel not set. Please configure a log channel for warnings!\nUse command `..setlogchannel`');
         }
 
-        const sender = message.author.tag;
+        const sender = message.author.id;
 
         if (!data || !data.data || !data.data[0]) {
             console.error('Failed to retrieve GIF from Giphy API');
@@ -47,7 +47,8 @@ module.exports = {
             .setColor('#FF0000')
             .setTitle('User Warn')
             .setImage(gifUrl)
-            .setDescription(`**${user.tag}** has been Warned for: ${reason}\nBy: **${sender}**`)
+            .setDescription(`<@${user.id}> has been Warned by <@${sender}> for: <@${reason}`)
+            .setFooter({ text: footer, iconUrl: logo })
             .setTimestamp();
 
         const logChannel = message.guild.channels.cache.get(logChannelId);

@@ -25,8 +25,9 @@ module.exports = {
         const reportEmbed = new EmbedBuilder()
         .setColor('#FFD700')
         .setTitle('User Reported')
-        .setDescription(`${user.tag} has been reported by ${message.author.tag} for: ${reason}`)
-        .setTimestamp();
+        .setDescription(`<@${user.id}> has been reported by <@${message.author.id}> for: ${reason}`)
+        .setTimestamp()
+        .setFooter({ text: footer, iconUrl: logo });
 
         // Send the report message to the log channel
         const logChannel = message.guild.channels.cache.get(logChannelId);

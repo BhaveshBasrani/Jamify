@@ -2,6 +2,7 @@ const { QueryType } = require('discord-player');
 const { EmbedBuilder } = require('discord.js');
 const Queue = require('../../../models/queue.js');
 const { banner, logo, footer } = require('../../../config.json')
+
 module.exports = {
     name: 'play',
     description: 'Plays a song from Spotify.',
@@ -15,6 +16,10 @@ module.exports = {
         const voiceChannel = message.member.voice.channel;
         if (!voiceChannel) {
             return message.reply('You need to be in a voice channel to play music!');
+        }
+
+        if (!message.client.player) {
+            return message.reply('Player is not initialized.');
         }
 
         await Queue.deleteOne({ guildId: message.guild.id });

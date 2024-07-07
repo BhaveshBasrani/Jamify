@@ -1,7 +1,7 @@
 const { PermissionsBitField, EmbedBuilder } = require('discord.js');
 const GuildConfig = require('../../../models/guildConfig.js'); // Adjust the path as needed
 const fetch = require('node-fetch');
-const { giphyk } = require('../../../config.json');
+const { giphyk, logo, footer } = require('../../../config.json');
 
 module.exports = {
   name: 'unban',
@@ -58,6 +58,7 @@ module.exports = {
       .setColor('#00FF00')
       .setTitle('User Unbanned')
       .setImage(gifUrl)
+      .setFooter({ text: footer, iconUrl: logo })
       .setDescription(`<@${userId}> has been unbanned for: ${reason}\nBy: <@${sender}>`)
       .setTimestamp();
 
