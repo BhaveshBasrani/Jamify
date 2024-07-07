@@ -6,17 +6,25 @@
     "@vitalets/google-translate-api": "^9.2.0",
     "discord-player": "^6.6.10",
     "discord.js": "^14.15.3",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
     "ffmpeg": "^0.0.4",
+    "giphy-api": "^2.0.2",
     "mediaplex": "^0.0.9",
     "mongoose": "^8.4.4",
     "node-fetch": "^2.7.0",
+    "passport": "^0.7.0",
+    "passport-discord": "^0.1.4",
+    "socket.io": "^4.7.5",
     "ytdl-core": "^4.11.5"
   },
   "name": "src",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node deploy.js",
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
