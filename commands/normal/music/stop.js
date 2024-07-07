@@ -1,6 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
 const { useQueue } = require('discord-player')
 const Queue = require('../../../models/queue.js')
+const { banner, footer, logo } = require('../../../config.json')
 
 module.exports = {
     name: 'stop',
