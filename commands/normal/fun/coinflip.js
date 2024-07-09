@@ -5,6 +5,7 @@ module.exports = {
     name: 'coinflip',
     description: 'Flips a coin.',
     category: 'fun',
+    aliases: ['coin', 'flip'],
     async execute(message) {
         const result = Math.random() < 0.5 ? 'Heads' : 'Tails';
 

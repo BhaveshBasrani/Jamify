@@ -5,6 +5,7 @@ module.exports = {
     name: '8ball',
     description: 'Answers your question with a magic 8-ball response.',
     category: 'fun',
+    aliases: ['eightball', 'magic', '8', 'ball'], 
     async execute(message, args) {
         const responses = [
             'It is certain.',

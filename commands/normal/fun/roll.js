@@ -5,6 +5,7 @@ module.exports = {
     name: 'roll',
     description: 'Rolls a dice.',
     category: 'fun',
+    aliases: ['dice', 'roll'],
     async execute(message) {
         const sides = 6;
         const result = Math.floor(Math.random() * sides) + 1;

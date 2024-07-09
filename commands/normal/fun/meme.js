@@ -5,6 +5,7 @@ module.exports = {
     name: 'meme',
     description: 'Fetches a random meme.',
     category: 'fun',
+    aliases: ['mem', 'me'],
     async execute(message) {
         console.log('Executing command: meme');
         try {
