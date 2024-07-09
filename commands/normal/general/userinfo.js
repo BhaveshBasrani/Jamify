@@ -10,13 +10,17 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle('User Info')
             .setThumbnail(member.user.displayAvatarURL())
-            .addField('Username', member.user.tag)
-            .addField('ID', member.user.id)
-            .addField('Joined Server', member.joinedAt.toDateString())
-            .addField('Account Created', member.user.createdAt.toDateString())
             .setColor('Green')
-            .setImage( banner )
+            .setImage(banner)
             .setFooter({ text: footer, iconURL: logo });
+
+        embed.data.fields = [
+            { name: 'Username', value: member.user.tag, inline: true },
+            { name: 'ID', value: member.user.id, inline: true },
+            { name: 'Joined Server', value: member.joinedAt.toDateString(), inline: true },
+            { name: 'Account Created', value: member.user.createdAt.toDateString(), inline: true },
+        ];
+
         message.channel.send({ embeds: [embed] });
     },
 };
