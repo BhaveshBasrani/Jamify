@@ -1,4 +1,4 @@
-const { EmbedBuilder, MessageActionRow, MessageSelectMenu } = require('discord.js');
+const { EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder } = require('discord.js');
 const fetch = require('node-fetch');
 const { footer, logo } = require('../../../config.json');
 
@@ -14,9 +14,9 @@ module.exports = {
                 .setColor('Purple')
                 .setFooter({ text: footer, iconURL: logo });
 
-            const row = new MessageActionRow()
+            const row = new ActionRowBuilder()
                 .addComponents(
-                    new MessageSelectMenu()
+                    new StringSelectMenuBuilder()
                         .setCustomId('truthordare')
                         .setPlaceholder('Select an option')
                         .addOptions([
@@ -50,6 +50,26 @@ module.exports = {
                             .setFooter({ text: footer, iconURL: logo });
 
                         await i.update({ embeds: [truthEmbed], components: [] });
+
+                        const answer = await message.channel.send('Please respond with your answer to the truth question.');
+
+                        const answerFilter = m => m.author.id === message.author.id;
+                        const answerCollector = message.channel.createMessageCollector({ filter: answerFilter, time: 30000, max: 1 });
+
+                        answerCollector.on('collect', async m => {
+                            try {
+                                const answerEmbed = new EmbedBuilder()
+                                    .setTitle('Truth Answer')
+                                    .setDescription(m.content)
+                                    .setColor('Blue')
+                                    .setFooter({ text: footer, iconURL: logo });
+
+                                await message.channel.send({ embeds: [answerEmbed] });
+                            } catch (error) {
+                                console.error(error);
+                                await message.reply({ content: 'An error occurred. Please try again.', ephemeral: true });
+                            }
+                        });
                     } else if (i.values[0] === 'dare') {
                         const response = await fetch('https://api.truthordarebot.xyz/api/dare');
                         const data = await response.json();
@@ -60,6 +80,26 @@ module.exports = {
                             .setFooter({ text: footer, iconURL: logo });
 
                         await i.update({ embeds: [dareEmbed], components: [] });
+
+                        const answer = await message.channel.send('Please respond with your answer to the dare.');
+
+                        const answerFilter = m => m.author.id === message.author.id;
+                        const answerCollector = message.channel.createMessageCollector({ filter: answerFilter, time: 30000, max: 1 });
+
+                        answerCollector.on('collect', async m => {
+                            try {
+                                const answerEmbed = new EmbedBuilder()
+                                    .setTitle('Dare Answer')
+                                    .setDescription(m.content)
+                                    .setColor('Red')
+                                    .setFooter({ text: footer, iconURL: logo });
+
+                                await message.channel.send({ embeds: [answerEmbed] });
+                            } catch (error) {
+                                console.error(error);
+                                await message.reply({ content: 'An error occurred. Please try again.', ephemeral: true });
+                            }
+                        });
                     }
                 } catch (error) {
                     console.error(error);

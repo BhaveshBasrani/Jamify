@@ -4,9 +4,10 @@ const { YouTubeExtractor, SpotifyExtractor } = require('@discord-player/extracto
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
-const { token, mongodb, banner, logo, footer } = require('./config.json');
+const { token, mongodb, banner, logo, footer, prefix } = require('./config.json');
 const commandHandler = require('./handlers/commandHandler.js');
 const Queue = require('./models/queue.js')
+const ServerSettings = require('./models/ServerSettings.js');
 
 const client = new Client({
     intents: [
@@ -56,6 +57,11 @@ for (const folder of commandFolders) {
     for (const file of commandFiles) {
         const command = require(`./commands/normal/${folder}/${file}`);
         client.commands.set(command.name, command);
+        if (command.aliases) {
+            for (const alias of command.aliases) {
+                client.commands.set(alias, command);
+            }
+        }
     }
 }
 
@@ -140,13 +146,13 @@ async function restoreState(guildId) {
     // Send the "now playing" embed
     if (firstSong && firstSong.channelId && client.channels.cache.get(firstSong.channelId)) {
         const nowPlayingEmbed = new EmbedBuilder()
-            .setTitle('Bot Has Been Restarted... \n*Queue Restored* \n**Now Playing**')
-            .setThumbnail(firstSong.thumbnail)
-            .setDescription(`**${firstSong.title}**`)
-            .setImage(banner)
-            .setURL(firstSong.url)
-            .setColor('Blue')
-            .setFooter({ text: footer, iconURL: logo });
+           .setTitle('Bot Has Been Restarted... \n*Queue Restored* \n**Now Playing**')
+           .setThumbnail(firstSong.thumbnail)
+           .setDescription(`**${firstSong.title}**`)
+           .setImage(banner)
+           .setURL(firstSong.url)
+           .setColor('Blue')
+           .setFooter({ text: footer, iconURL: logo });
 
         client.channels.cache.get(firstSong.channelId).send({ embeds: [nowPlayingEmbed] });
     }
@@ -154,9 +160,24 @@ async function restoreState(guildId) {
     console.log(`Restored queue for guild ${guildId}`);
 }
 
+client.on('messageCreate', async (message) => {
+    if (message.type !== 0 || message.author.bot) return;
+
+    if (message.content.toLowerCase() === `<@${client.user.id}>` || message.content.toLowerCase() === `<@!${client.user.id}>`) {
+        const guildId = message.guild.id; // Add this line to define the guildId variable
+
+        const embed = new EmbedBuilder()
+            .setTitle('Heyy!!! Am Jamify')
+            .setDescription(`My prefix in this server is ${prefix} Use ${prefix}help for more info.`)
+            .setColor('Blue')
+            .setFooter({ text: footer, iconURL: logo });
+
+        message.channel.send({ embeds: [embed] });
+    }
+});
+
 // Call restoreState for each guild the bot is in
 client.on('ready', async () => {
-    console.log(`Logged in as ${client.user.tag}!`);
     client.guilds.cache.forEach(guild => {
         restoreState(guild.id);
     });
