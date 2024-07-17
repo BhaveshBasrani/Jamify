@@ -10,7 +10,13 @@ module.exports = {
         const queue = message.client.player.nodes.get(message.guild.id);
 
         if (!queue || !queue.playing) {
-            return message.reply('No music is being played!');
+            const errorEmbed = new EmbedBuilder()
+                .setTitle('Error')
+                .setDescription('No music is being played!')
+                .setColor('Red')
+                .setFooter({ text: footer, iconURL: logo });
+
+            return message.channel.send({ embeds: [errorEmbed] });
         }
 
         const track = queue.current;
@@ -18,7 +24,13 @@ module.exports = {
         const data = await response.json();
 
         if (!data.lyrics) {
-            return message.reply('No lyrics found for this song!');
+            const errorEmbed = new EmbedBuilder()
+                .setTitle('Error')
+                .setDescription('No lyrics found for this song!')
+                .setColor('Red')
+                .setFooter({ text: footer, iconURL: logo });
+
+            return message.channel.send({ embeds: [errorEmbed] });
         }
 
         const embed = new EmbedBuilder()

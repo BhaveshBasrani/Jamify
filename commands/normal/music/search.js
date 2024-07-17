@@ -14,7 +14,7 @@ module.exports = {
 
         const result = await message.client.player.search(query, {
             requestedBy: message.author,
-            searchEngine: QueryType.AUTO,
+            searchEngine: QueryType.SPOTIFY_SEARCH,
         });
 
         if (!result || !result.tracks.length) {
