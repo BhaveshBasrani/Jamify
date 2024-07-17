@@ -8,10 +8,9 @@ module.exports = {
         client.user.setPresence({
             activities: [{
                 name: 'NCS on Twitch',
-                type: 4, // Listening
-                url: 'https://www.twitch.tv/ncs' // URL of the Twitch channel
+                type: 1, 
+                url: 'https://www.twitch.tv/ncsvibes' // URL of the Twitch channel
             }],
-            status: 'dnd'
         });
     }
 }

@@ -1,13 +1,13 @@
 const { Client, GatewayIntentBits, Collection, EmbedBuilder } = require('discord.js');
 const { Player } = require('discord-player');
-const { YouTubeExtractor, SpotifyExtractor } = require('@discord-player/extractor');
+const { YoutubeiExtractor, createYoutubeiStream } = require("discord-player-youtubei");
+const { SpotifyExtractor } = require('@discord-player/extractor');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
 const { token, mongodb, banner, logo, footer, prefix } = require('./config.json');
 const commandHandler = require('./handlers/commandHandler.js');
 const Queue = require('./models/queue.js')
-const ServerSettings = require('./models/ServerSettings.js');
 
 const client = new Client({
     intents: [
@@ -28,8 +28,12 @@ client.player = new Player(client, {
 });
 
 // Register extractors
-client.player.extractors.register(YouTubeExtractor);
-client.player.extractors.register(SpotifyExtractor);
+client.player.extractors.register(YoutubeiExtractor, {
+    authentication: "ya29.a0AXooCgtT-6ElCJUHgValIxNkFM_EPeUAxCmbx_YrqSvqnnAVQwZ17560oHqaHi6FA-eHuJDwX2HNRBdW9YDk3eup5Vu9xGWSzCzvrF48rKpPr0PPuZtPyF-MkQlzXnCGWO1euzDVRvjQJ9t43jgjipGEa0IkYlg-wo1cSY1FBpad1XK9aCgYKAQ8SARASFQHGX2MixbxXSsn851K7vUCD9zrpew0183"
+})
+client.player.extractors.register(SpotifyExtractor, {
+    createStream: createYoutubeiStream
+})
 
 client.player.on('error', (error) => {
     console.error(`Error emitted from the queue: ${error.message}`);

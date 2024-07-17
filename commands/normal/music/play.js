@@ -30,7 +30,7 @@ module.exports = {
         try {
             result = await message.client.player.search(query, {
                 requestedBy: message.author,
-                searchEngine: QueryType.AUTO,
+                searchEngine: QueryType.SPOTIFY_SEARCH,
             });
         } catch (error) {
             console.error(error);

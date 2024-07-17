@@ -30,7 +30,7 @@ module.exports = {
                 return message.reply('An error occurred while trying to play the next track.');
             }
         } else {
-            node.stop();
+            node.stop(message.guild.id);
         }
 
         const embed = new EmbedBuilder()
