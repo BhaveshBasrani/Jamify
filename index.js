@@ -5,7 +5,7 @@ const { SpotifyExtractor } = require('@discord-player/extractor');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
-const { token, mongodb, banner, logo, footer, prefix } = require('./config.json');
+const { token, mongodb, banner, logo, footer, prefix, auth } = require('./config.json');
 const commandHandler = require('./handlers/commandHandler.js');
 const Queue = require('./models/queue.js')
 
@@ -29,7 +29,7 @@ client.player = new Player(client, {
 
 // Register extractors
 client.player.extractors.register(YoutubeiExtractor, {
-    authentication: "ya29.a0AXooCgtT-6ElCJUHgValIxNkFM_EPeUAxCmbx_YrqSvqnnAVQwZ17560oHqaHi6FA-eHuJDwX2HNRBdW9YDk3eup5Vu9xGWSzCzvrF48rKpPr0PPuZtPyF-MkQlzXnCGWO1euzDVRvjQJ9t43jgjipGEa0IkYlg-wo1cSY1FBpad1XK9aCgYKAQ8SARASFQHGX2MixbxXSsn851K7vUCD9zrpew0183"
+    authentication: auth
 })
 client.player.extractors.register(SpotifyExtractor, {
     createStream: createYoutubeiStream
