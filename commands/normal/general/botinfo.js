@@ -6,10 +6,10 @@ module.exports = {
     description: 'Displays bot info.',
     category: 'general',
     execute(message) {
-        console.log('Executing command: botinfo');
         const { client } = message;
         const embed = new EmbedBuilder()
             .setTitle('Bot Info')
+            .setTimestamp()
             .setThumbnail(client.user.avatarURL())
             .addFields(
                 { name: 'Bot Name', value: client.user.username, inline: true },
