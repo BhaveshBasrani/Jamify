@@ -180,6 +180,24 @@ client.on('messageCreate', async (message) => {
     }
 });
 
+client.player.on('queueEnd', (queue) => {
+    const guildId = queue.guild.id;
+    const channelId = queue.metadata.channel.id;
+  
+    // Send an embed to the channel
+    const embed = new EmbedBuilder()
+      .setTitle('Queue has ended!')
+      .setDescription('The queue has ended. You can add more songs to start playing again!')
+      .setColor('Blue')
+      .setFooter({ text: footer, iconURL: logo });
+  
+    client.channels.cache.get(channelId).send({ embeds: [embed] });
+  
+    // Clear the queue
+    queue.clear();
+    console.log(`Queue cleared for guild ${guildId}`);
+  });
+  
 // Call restoreState for each guild the bot is in
 client.on('ready', async () => {
     client.guilds.cache.forEach(guild => {
