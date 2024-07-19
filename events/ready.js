@@ -6,10 +6,10 @@ module.exports = {
 
         let activities = [
             { name: 'Jamify | NCS on Twitch', type: 1, url: 'https://www.twitch.tv/ncsvibes' },
-            { name: 'Jamify | Music on Spotify', type: 2, url: 'https://open.spotify.com/track/7MXVkk9YMctZqd1Srtv4MB' },
-            { name: 'Jamify | Coding on GitHub', type: 0, url: 'https://github.com/BhaveshBasrani/Jamify' },
-            { name: 'Jamify | Gaming on Discord', type: 3, url: 'https://discord.gg/r8pVRq9SqA' },
-            { name: 'Jamify | MrBeast on YouTube', type: 5, url: 'https://www.youtube.com/user/mrbeast6000'},
+            { name: 'Jamify | Music on Spotify', type: 1, url: 'https://open.spotify.com/track/7MXVkk9YMctZqd1Srtv4MB' },
+            { name: 'Jamify | Coding on GitHub', type: 1, url: 'https://github.com/BhaveshBasrani/Jamify' },
+            { name: 'Jamify | Gaming on Discord', type: 1, url: 'https://discord.gg/r8pVRq9SqA' },
+            { name: 'Jamify | MrBeast on YouTube', type: 1, url: 'https://www.youtube.com/user/mrbeast6000'},
             { name: 'Jamify | to ..help', type: 2 },
         ];
 
