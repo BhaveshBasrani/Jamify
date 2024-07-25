@@ -2,6 +2,8 @@ const { Schema, model } = require('mongoose');
 
 const songSchema = new Schema({
     title: String,
+    duration: String,
+    author: String,
     url: String,
     thumbnail: String,
     requestedBy: String,
