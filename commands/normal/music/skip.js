@@ -1,45 +1,37 @@
 const { EmbedBuilder } = require('discord.js');
+const { useQueue } = require('discord-player');
 const Queue = require('../../../models/queue.js');
-const { banner, logo, footer } = require('../../../config.json')
+const { banner, logo, footer } = require('../../../config.json');
 
 module.exports = {
-    name: 'skip',
-    description: 'Skips the current song.',
-    category: 'music',
-    async execute(message) {
-        const queue = await Queue.findOne({ guildId: message.guild.id });
+  name: 'skip',
+  description: 'Skips the current song.',
+  category: 'music',
+  async execute(message) {
+    const queue = useQueue(message.guild.id);
+    const customQueue = await Queue.findOne({ guildId: message.guild.id });
 
-        if (!queue || !queue.songs.length) {
-            return message.channel.send('No more songs in the queue!');
-        }
+    if (!queue || !queue.tracks.length) {
+      return message.channel.send('No more songs in the queue!');
+    }
 
-        const currentTrack = queue.songs.shift();
-        await queue.save();
+    const currentTrack = queue.currentTrack;
+    queue.node.skip();
 
-        let node = message.client.player.nodes.get(message.guild.id);
-        if (!node) {
-            return message.reply('No music is being played!');
-        }
+    // Update your custom queue model as needed
+    if (customQueue) {
+      customQueue.tracks.shift();
+      await customQueue.save();
+    }
 
-        if (queue.songs.length > 0) {
-            const nextTrack = queue.songs[0];
-            try {
-                await node.play(nextTrack.url);
-            } catch (error) {
-                console.error(error);
-                return message.reply('An error occurred while trying to play the next track.');
-            }
-        } else {
-            node.stop(message.guild.id);
-        }
+    const embed = new EmbedBuilder()
+      .setTitle('Song Skipped')
+      .setAuthor({name: 'Jamify', iconURL:logo})
+      .setImage(banner)
+      .setDescription(`Skipped **${currentTrack.title}** By **${currentTrack.author}**`)
+      .setColor('Yellow')
+      .setFooter({ text: footer, iconURL: logo });
 
-        const embed = new EmbedBuilder()
-            .setTitle('Song Skipped')
-            .setImage(banner)
-            .setDescription(`Skipped to the next song!`)
-            .setColor('Yellow')
-            .setFooter({ text: footer, iconURL: logo});
-
-        message.channel.send({ embeds: [embed] });
-    },
+    message.channel.send({ embeds: [embed] });
+  },
 };

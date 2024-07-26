@@ -1,6 +1,6 @@
 const { QueryType } = require('discord-player');
 const { EmbedBuilder } = require('discord.js');
-const Queue = require('../../../models/queue.js'); // Adjust the path as needed
+const Queue = require('../../../models/queue.js');
 const { logo, banner, footer } = require('../../../config.json')
 
 module.exports = {
@@ -38,6 +38,8 @@ module.exports = {
             title: track.title,
             url: track.url,
             thumbnail: track.thumbnail,
+            duration: track.duration,
+            requestedBy : track.requestedBy,
             requestedBy: message.author.username,
             channelId: message.channel.id,
             voiceChannelId: message.member.voice.channel.id
@@ -78,14 +80,30 @@ module.exports = {
                 return message.reply('An error occurred while trying to play the track.');
             }
         } else {
-            node.queue.add(track.url);
+            queue.songs.push(song);
         }
 
         const embed = new EmbedBuilder()
             .setTitle('Song Added to Queue')
             .setDescription(`${track.title} has been added to the queue.`)
             .setColor('Blue')
+            .addFields({
+                name: '**Position in Queue**',
+                value: `${queue.songs.indexOf(song) + 1} of ${queue.songs.length}`,
+                inline: true,
+              },
+              {
+                name: '**Duration**',
+                value: `${track.duration}`,
+                inline: true,
+              },
+              {
+                name: '**Requested By**',
+                value: `${song.requestedBy}`,
+                inline: true,
+              })
             .setThumbnail(track.thumbnail)
+            .setImage(banner)
             .setFooter({ text: footer, iconURL: logo });
         message.channel.send({ embeds: [embed] });
     },

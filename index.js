@@ -27,9 +27,10 @@ client.player = new Player(client, {
     }
 });
 
-// Register extractors
 client.player.extractors.register(YoutubeiExtractor, {
-    authentication: auth
+    authentication: auth,
+    streamOptions: {
+      useClient: "ANDROID"}
 })
 client.player.extractors.register(SpotifyExtractor, {
     createStream: createYoutubeiStream
@@ -150,13 +151,30 @@ async function restoreState(guildId) {
     // Send the "now playing" embed
     if (firstSong && firstSong.channelId && client.channels.cache.get(firstSong.channelId)) {
         const nowPlayingEmbed = new EmbedBuilder()
-           .setTitle('Bot Has Been Restarted... \n*Queue Restored* \n**Now Playing**')
-           .setThumbnail(firstSong.thumbnail)
-           .setDescription(`**${firstSong.title}**`)
-           .setImage(banner)
-           .setURL(firstSong.url)
-           .setColor('Blue')
-           .setFooter({ text: footer, iconURL: logo });
+           .setTitle('Now Playing')
+          .setAuthor({ name: 'Jamify', iconURL: logo })
+          .setDescription(`**${firstSong.title}** by **${firstSong.author}**`)
+          .setColor('Blue')
+          .setThumbnail(firstSong.thumbnail)
+          .setImage(banner)
+          .setFooter({ text: footer, iconURL: logo })
+          .addFields(
+            {
+              name: '> **Duration**',
+              value: `${firstSong.duration}`,
+              inline: true,
+            },
+            {
+              name: '> **Requested By**',
+              value: `@${firstSong.requestedBy}`,
+              inline: true,
+            },
+            {
+              name: '> **Position in Queue**',
+              value: `${node.queue.length}`,
+              inline: true,
+            }
+          );
 
         client.channels.cache.get(firstSong.channelId).send({ embeds: [nowPlayingEmbed] });
     }
@@ -172,7 +190,7 @@ client.on('messageCreate', async (message) => {
 
         const embed = new EmbedBuilder()
             .setTitle('Heyy!!! Am Jamify')
-            .setDescription(`My prefix in this server is ${prefix} Use ${prefix}help for more info.`)
+            .setDescription(`> My prefix in this server is ${prefix} Use ${prefix}help for more info.`)
             .setColor('Blue')
             .setFooter({ text: footer, iconURL: logo });
 

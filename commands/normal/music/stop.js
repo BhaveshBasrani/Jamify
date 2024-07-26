@@ -18,6 +18,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle('Music Stopped')
             .setImage(banner)
+            .setAuthor({name: 'Jamify', iconURL:logo})
             .setDescription('The music has been stopped and the queue has been cleared.')
             .setColor('Red')
             .setFooter({ text: footer , iconURL: logo});
