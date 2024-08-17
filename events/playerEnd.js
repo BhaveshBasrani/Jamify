@@ -1,33 +1,28 @@
-const Queue = require('../models/queue.js'); // Adjust the path as needed
 const { EmbedBuilder } = require('discord.js');
-const { footer, logo } = require('../config.json');
+const { banner, logo, footer } = require('../config.json');
 
 module.exports = (client) => {
-  client.player.on('end', async (queue) => {
-    const guildQueue = await Queue.findOne({ guildId: queue.guild.id });
-    if (guildQueue && guildQueue.songs.length > 0) {
-      // Remove the finished song from the queue
-      guildQueue.songs.shift();
-      await guildQueue.save();
+  client.player.on('queueEnd', (queue) => {
+    console.log('queueEnd event triggered'); // Debug log
 
-      // Check if there are more songs to play
-      if (guildQueue.songs.length > 0) {
-        const nextSong = guildQueue.songs[0];
-        queue.node.play(nextSong.url);
-      } else {
-        const finishedEmbed = new EmbedBuilder()
-          .setTitle('Queue Finished')
-          .setAuthor({ name: 'Jamify', iconURL: logo })
-          .setDescription('The music queue has ended.')
-          .setColor('Blue')
-          .setFooter({ text: footer, iconURL: logo });
-          queue.metadata.channel.send({ embeds: [finishedEmbed] });
-      }
-      if (queue.metadata.channel) {
-        queue.metadata.channel.send({ embeds: [finishedEmbed] });
-      } else {
-        console.error('No channel object found in queue metadata');
-      }
+    const embed = new EmbedBuilder()
+      .setTitle('Thank You!')
+      .setDescription('Thank you for using Jamify! 🎶')
+      .setColor('Blue')
+      .setImage(banner)
+      .setFooter({ text: footer, iconURL: logo });
+
+    console.log('queue.player.metadata:', queue.metadata.channel);
+    if (queue.metadata.channel) {
+      console.log('Sending embed to channel:', queue.metadata.channel.id); // Debug log
+      queue.metadata.channel.send({ embeds: [embed] })
+        .then(() => console.log('Embed sent successfully'))
+        .catch((error) => console.error('Error sending embed:', error));
+    } else {
+      console.error('player.metadata.channel is null or undefined');
     }
+
+    queue.destroy();
+    console.log('Queue destroyed'); // Debug log
   });
 };

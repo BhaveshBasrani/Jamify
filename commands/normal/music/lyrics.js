@@ -1,15 +1,19 @@
 const { EmbedBuilder } = require('discord.js');
-const fetch = require('node-fetch');
+const { useQueue } = require("discord-player");
+const { lyricsExtractor } = require('@discord-player/extractor');
 const { logo, banner, footer } = require('../../../config.json')
+
+const lyricsFinder = lyricsExtractor();
 
 module.exports = {
     name: 'lyrics',
     description: 'Fetches lyrics for the currently playing song.',
     category: 'music',
+    aliases: ['ly', 'l'],
     async execute(message) {
-        const queue = message.client.player.nodes.get(message.guild.id);
+        const queue = useQueue(message.guild.id);
 
-        if (!queue || !queue.playing) {
+        if (!queue.isPlaying()) {
             const errorEmbed = new EmbedBuilder()
                 .setTitle('Error')
                 .setDescription('No music is being played!')
@@ -19,11 +23,10 @@ module.exports = {
             return message.channel.send({ embeds: [errorEmbed] });
         }
 
-        const track = queue.current;
-        const response = await fetch(`https://api.lyrics.ovh/v1/${track.author}/${track.title}`);
-        const data = await response.json();
-
-        if (!data.lyrics) {
+        const track = queue.currentTrack; //Gets the current track being played
+        
+        const lyrics = await lyricsFinder.search(`${track.author} ${track.title}`).catch(() => null);
+        if (!lyrics) {
             const errorEmbed = new EmbedBuilder()
                 .setTitle('Error')
                 .setDescription('No lyrics found for this song!')
@@ -34,11 +37,16 @@ module.exports = {
         }
 
         const embed = new EmbedBuilder()
-            .setTitle(`Lyrics for ${track.title}`)
-            .setImage(banner)
-            .setDescription(data.lyrics)
-            .setColor('Green')
-            .setFooter({ text: footer, iconURL: logo });
+            .setTitle(lyrics.title)
+            .setURL(lyrics.url)
+            .setThumbnail(lyrics.thumbnail)
+            .setAuthor({
+                name: lyrics.artist.name,
+                iconURL: lyrics.artist.image,
+                url: lyrics.artist.url
+            })
+            .setDescription(lyrics.lyrics)
+            .setColor('Random');
 
         message.channel.send({ embeds: [embed] });
     },

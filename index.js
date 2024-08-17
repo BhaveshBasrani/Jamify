@@ -7,7 +7,6 @@ const fs = require('fs');
 const path = require('path');
 const { token, mongodb, banner, logo, footer, prefix, auth } = require('./config.json');
 const commandHandler = require('./handlers/commandHandler.js');
-const Queue = require('./models/queue.js')
 
 const client = new Client({
     intents: [
@@ -31,10 +30,10 @@ client.player.extractors.register(YoutubeiExtractor, {
     authentication: auth,
     streamOptions: {
       useClient: "ANDROID"}
-})
+});
 client.player.extractors.register(SpotifyExtractor, {
     createStream: createYoutubeiStream
-})
+});
 
 client.player.on('error', (error) => {
     console.error(`Error emitted from the queue: ${error.message}`);
@@ -94,133 +93,23 @@ for (const file of eventFiles) {
 // Invoke the command handler to log command information
 commandHandler(client);
 
-async function restoreState(guildId) {
-    let queueData;
-    try {
-        queueData = await Queue.findOne({ guildId: guildId });
-    } catch (error) {
-        console.error(`Failed to retrieve queue data for guild ${guildId}:`, error);
-        return;
-    }
-
-    if (!queueData || !queueData.songs.length) {
-        console.log(`No saved queue for guild ${guildId}`);
-        return;
-    }
-
-    let node = client.player.nodes.get(guildId);
-    if (!node) {
-        try {
-            node = await client.player.nodes.create(guildId, {
-                metadata: {
-                    channel: queueData.songs[0].channelId ? client.channels.cache.get(queueData.songs[0].channelId) : null
-                }
-            });
-            if (queueData.songs[0].voiceChannelId) {
-                await node.connect(client.channels.cache.get(queueData.songs[0].voiceChannelId));
-            }
-        } catch (error) {
-            console.error(`Failed to create or connect node for guild ${guildId}:`, error);
-            return;
-        }
-    }
-
-    if (!node.queue) {
-        node.queue = [];
-    }
-
-    queueData.songs.forEach(song => {
-        if (song.url) {
-            if (typeof node.queue.add === 'function') {
-                node.queue.add(song.url);
-            } else {
-                node.queue.push(song.url);
-            }
-        }
-    })
-
-    const firstSong = queueData.songs[0];
-    node.play(firstSong.url, {
-        metadata: {
-            requestedBy: firstSong.requestedBy,
-            channelId: firstSong.channelId,
-            voiceChannelId: firstSong.voiceChannelId
-        }
-    });
-
-    // Send the "now playing" embed
-    if (firstSong && firstSong.channelId && client.channels.cache.get(firstSong.channelId)) {
-        const nowPlayingEmbed = new EmbedBuilder()
-           .setTitle('Now Playing')
-          .setAuthor({ name: 'Jamify', iconURL: logo })
-          .setDescription(`**${firstSong.title}** by **${firstSong.author}**`)
-          .setColor('Blue')
-          .setThumbnail(firstSong.thumbnail)
-          .setImage(banner)
-          .setFooter({ text: footer, iconURL: logo })
-          .addFields(
-            {
-              name: '> **Duration**',
-              value: `${firstSong.duration}`,
-              inline: true,
-            },
-            {
-              name: '> **Requested By**',
-              value: `@${firstSong.requestedBy}`,
-              inline: true,
-            },
-            {
-              name: '> **Position in Queue**',
-              value: `${node.queue.length}`,
-              inline: true,
-            }
-          );
-
-        client.channels.cache.get(firstSong.channelId).send({ embeds: [nowPlayingEmbed] });
-    }
-
-    console.log(`Restored queue for guild ${guildId}`);
-}
-
 client.on('messageCreate', async (message) => {
     if (message.type !== 0 || message.author.bot) return;
 
     if (message.content.toLowerCase() === `<@${client.user.id}>` || message.content.toLowerCase() === `<@!${client.user.id}>`) {
-        const guildId = message.guild.id; // Add this line to define the guildId variable
-
         const embed = new EmbedBuilder()
             .setTitle('Heyy!!! Am Jamify')
             .setDescription(`> My prefix in this server is ${prefix} Use ${prefix}help for more info.`)
             .setColor('Blue')
+            .setImage(banner)
             .setFooter({ text: footer, iconURL: logo });
 
         message.channel.send({ embeds: [embed] });
     }
 });
 
-client.player.on('queueEnd', (queue) => {
-    const guildId = queue.guild.id;
-    const channelId = queue.metadata.channel.id;
-  
-    // Send an embed to the channel
-    const embed = new EmbedBuilder()
-      .setTitle('Queue has ended!')
-      .setDescription('The queue has ended. You can add more songs to start playing again!')
-      .setColor('Blue')
-      .setFooter({ text: footer, iconURL: logo });
-  
-    client.channels.cache.get(channelId).send({ embeds: [embed] });
-  
-    // Clear the queue
-    queue.clear();
-    console.log(`Queue cleared for guild ${guildId}`);
-  });
-  
-// Call restoreState for each guild the bot is in
-client.on('ready', async () => {
-    client.guilds.cache.forEach(guild => {
-        restoreState(guild.id);
-    });
+client.on('ready', () => {
+    console.log(`Logged in as ${client.user.tag}!`);
 });
 
 client.login(token);

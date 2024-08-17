@@ -8,6 +8,7 @@ module.exports = {
     category: 'music',
     async execute(message, args) {
         const query = args.join(' ');
+        
         if (!query) {
             return message.reply('Please provide a song to search for.');
         }
@@ -77,12 +78,18 @@ module.exports = {
             }
         
             const nowPlayingEmbed = new EmbedBuilder()
-                .setTitle('Now Playing')
-                .setImage(banner)
-                .setDescription(`${track.title}`)
-                .setColor('Blue')
-                .setThumbnail(track.thumbnail)
-                .setFooter({ text: footer, iconURL: logo });
+            .setTitle('Now Playing')
+            .setAuthor({ name: 'Jamify', iconURL: logo })
+            .setDescription(`**${track.title}** by **${track.author}**`)
+            .setColor('Blue')
+            .setThumbnail(track.thumbnail)
+            .setImage(banner)
+            .setFooter({ text: footer })
+            .addFields(
+              { name: 'Duration', value: `${track.duration}`, inline: true },
+              { name: 'Search Query', value: `${query}`, inline: true },
+              { name: 'Requested By', value: `@${message.author.tag}`, inline: true }
+            );
         
             await i.editReply({ embeds: [nowPlayingEmbed], components: [] }); // Update after selection
         });
