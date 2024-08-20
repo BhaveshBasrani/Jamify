@@ -4,7 +4,7 @@ const { useMainPlayer, useQueue } = require("discord-player");
 
 module.exports = {
     name: 'lyrics',
-    description: 'Fetches lyrics for the currently playing song.',
+    description: 'Fetches the synced lyrics for the currently playing song.',
     category: 'music',
     aliases: ['sly', 'sl'],
     async execute(message) {
@@ -33,6 +33,7 @@ module.exports = {
             }
 
             const track = queue.currentTrack;
+            console.log(`${track.title} ${track.author}`)
 
             if (!track) {
                 const errorEmbed = new EmbedBuilder()
@@ -45,10 +46,10 @@ module.exports = {
             }
 
             const results = await player.lyrics.search({
-                q: `${track.title}`
+                q: `${track.title} ${track.author}`
             });
 
-            if (!results || !results[0]) {
+            if (!results) {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
                     .setDescription('No lyrics found for this song!')
@@ -70,7 +71,7 @@ module.exports = {
                 return message.channel.send({ embeds: [errorEmbed] });
             }
 
-            const syncedLyrics = queue.syncedLyrics(first.syncedLyrics);
+            const syncedLyrics = queue.syncedLyrics(first);
 
             if (!syncedLyrics) {
                 const errorEmbed = new EmbedBuilder()
