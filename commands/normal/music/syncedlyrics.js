@@ -1,7 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
-const { useQueue } = require("discord-player");
 const { logo, banner, footer } = require('../../../config.json');
-const { useMainPlayer } = require("discord-player");
+const { useMainPlayer, useQueue } = require("discord-player");
 
 module.exports = {
     name: 'lyrics',
