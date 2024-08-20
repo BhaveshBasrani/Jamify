@@ -1,9 +1,9 @@
 const { EmbedBuilder } = require('discord.js');
 const { useQueue } = require("discord-player");
 const { lyricsExtractor } = require('@discord-player/extractor');
-const { logo, banner, footer } = require('../../../config.json')
+const { logo, banner, footer, geniusApiToken } = require('../../../config.json')
 
-const lyricsFinder = lyricsExtractor();
+const lyricsFinder = lyricsExtractor(geniusApiToken);
 
 module.exports = {
     name: 'lyrics',
@@ -46,6 +46,7 @@ module.exports = {
                 url: lyrics.artist.url
             })
             .setDescription(lyrics.lyrics)
+            .setImage(banner)
             .setColor('Random');
 
         message.channel.send({ embeds: [embed] });

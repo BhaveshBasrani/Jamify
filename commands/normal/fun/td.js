@@ -6,6 +6,7 @@ module.exports = {
     name: 'td',
     description: 'Play truth or dare.',
     category: 'fun',
+    aliases: ['sh','s','shi'],
     async execute(message) {
         try {
             const embed = new EmbedBuilder()

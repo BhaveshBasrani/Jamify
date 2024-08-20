@@ -5,6 +5,7 @@ module.exports = {
     name: 'userinfo',
     description: 'Displays information about the user.',
     category: 'general',
+    aliases: ['ui', 'user', 'u'],
     async execute(message) {
         const member = message.mentions.members.first() || message.member;
         const embed = new EmbedBuilder()

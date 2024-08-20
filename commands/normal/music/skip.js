@@ -1,6 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
 const { useQueue } = require('discord-player');
-const Queue = require('../../../models/queue.js');
 const { banner, logo, footer } = require('../../../config.json');
 
 module.exports = {
@@ -9,21 +8,26 @@ module.exports = {
   category: 'music',
   async execute(message) {
     const queue = useQueue(message.guild.id);
-    if (!queue || !queue.tracks.length) {
-      return message.channel.send('No more songs in the queue!');
+    if (!queue || !queue.currentTrack) {
+      return message.reply('No song is currently playing!');
     }
 
     const currentTrack = queue.currentTrack;
+
     queue.node.skip();
 
     const embed = new EmbedBuilder()
       .setTitle('Song Skipped')
-      .setAuthor({name: 'Jamify', iconURL:logo})
+      .setAuthor({ name: 'Jamify', iconURL: logo })
       .setImage(banner)
-      .setDescription(`Skipped **${currentTrack.title}** By **${currentTrack.author}**`)
+      .setDescription(`Skipped **${currentTrack.title}** by **${currentTrack.author}**`)
+      .addFields(
+        { name: 'Skipped By', value: message.author.id, inline: true },
+        { name: 'Next Song', value: queue.tracks[0] ? queue.tracks[0].title : 'None', inline: true }
+      )
       .setColor('Yellow')
       .setFooter({ text: footer, iconURL: logo });
 
-    message.channel.send({ embeds: [embed] });
+      message.reply({ embeds: [embed] });
   },
 };

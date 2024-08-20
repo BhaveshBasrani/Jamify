@@ -5,6 +5,7 @@ module.exports = {
     name: 'serverinfo',
     description: 'Displays server information.',
     category: 'general',
+    aliases: ['si', 'sinfo', 's'],
     execute(message) {
         console.log('Executing command: serverinfo');
         const { guild } = message;

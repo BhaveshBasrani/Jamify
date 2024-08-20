@@ -5,6 +5,7 @@ module.exports = {
     name: 'botinfo',
     description: 'Displays bot info.',
     category: 'general',
+    aliases: ['bot','b','bo'],
     execute(message) {
         const { client } = message;
         const embed = new EmbedBuilder()

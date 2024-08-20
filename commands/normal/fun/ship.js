@@ -12,6 +12,7 @@ module.exports = {
   name: 'ship',
   description: 'Ship two users together.',
   category: 'fun',
+  aliases: ['sh','s','shi'],
   async execute(message, args) {
     if (args.length < 2) {
       return message.reply('Please mention two users to ship.');

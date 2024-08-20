@@ -1,26 +1,23 @@
 const { EmbedBuilder } = require('discord.js');
-const Queue = require('../../../models/queue.js');
-const { banner, logo, footer } = require('../../../config.json')
+const { Player } = require('discord-player');
 
 module.exports = {
     name: 'queue',
     description: 'Displays the current queue.',
     category: 'music',
     async execute(message) {
-        const queue = await Queue.findOne({ guildId: message.guild.id });
-
-        if (!queue || !queue.songs.length) {
+        const player = Player.get(message.guild.id);
+        if (!player || !player.queue.size) {
             return message.channel.send('No more songs in the queue!');
         }
 
-        const tracks = queue.songs
-            .map((track, index) => `${index + 1}. ${track.title} - ${track.requestedBy}`)
-            .join('\n');
-            
+        const tracks = player.queue.map((track, index) => `${index + 1}. ${track.title} - ${track.requestedBy}`);
+        const queueString = tracks.join('\n');
+
         const embed = new EmbedBuilder()
             .setTitle('Current Queue')
             .setImage(banner)
-            .setDescription(tracks || 'No more songs in the queue!')
+            .setDescription(queueString || 'No more songs in the queue!')
             .setColor('Green')
             .setFooter({ text: footer, iconURL: logo});
 

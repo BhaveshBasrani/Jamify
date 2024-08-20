@@ -5,6 +5,7 @@ module.exports = {
     name: 'avatar',
     description: 'Shows a user\'s avatar.',
     category: 'general',
+    aliases: ['a','av','avt'],
     execute(message, args) {
         console.log('Executing command: avatar');
         const user = message.mentions.users.first() || message.author;

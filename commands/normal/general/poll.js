@@ -5,6 +5,7 @@ module.exports = {
     name: 'poll',
     description: 'Creates a poll with reactions.',
     category: 'general',
+    aliases: ['po', 'pol'],
     async execute(message, args) {
         console.log('Executing command: poll');
         

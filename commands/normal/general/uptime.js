@@ -5,6 +5,7 @@ module.exports = {
   name: 'uptime',
   description: 'Shows bot\'s uptime.',
   category: 'general',
+  aliases: ['up','time']
   async execute(message) {
 
     let totalSeconds = Math.floor(message.client.uptime / 1000);
