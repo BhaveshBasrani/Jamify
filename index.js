@@ -98,11 +98,7 @@ commandHandler(client);
 client.on('messageCreate', async (message) => {
     if (message.type !== 0 || message.author.bot) return;
 
-    const serverSettings = await ServerSettings.findOne({ guildId: message.guild.id });
-
-// Log the fetched server settings for debugging
-console.log('Server Settings:', serverSettings);
-
+const serverSettings = await ServerSettings.findOne({ guildId: message.guild.id });
 // Use the default prefix if no custom prefix is set
 const prefix = serverSettings && serverSettings.prefix ? serverSettings.prefix : require('./config.json').prefix;
 

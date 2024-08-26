@@ -6,11 +6,8 @@ module.exports = {
         if (message.author.bot) return;
 
         // Fetch server settings from the database
-        const serverSettings = await ServerSettings.findOne({ guildId: message.guild.id });
-
-        // Use the default prefix if no custom prefix is set
-        const prefix = serverSettings ? serverSettings.prefix.text : require('../config.json').prefix;
-
+const serverSettings = await ServerSettings.findOne({ guildId: message.guild.id });
+const prefix = serverSettings && serverSettings.prefix ? serverSettings.prefix : require('../config.json').prefix;
         if (!message.content.startsWith(prefix)) return;
 
         const args = message.content.slice(prefix.length).trim().split(/ +/);
