@@ -3,7 +3,7 @@ const { logo, banner, footer } = require('../../../config.json');
 const { useMainPlayer, useQueue } = require("discord-player");
 
 module.exports = {
-    name: 'lyrics',
+    name: 'syncedlyrics',
     description: 'Fetches the synced lyrics for the currently playing song.',
     category: 'music',
     aliases: ['sly', 'sl'],
@@ -88,9 +88,11 @@ module.exports = {
                 .setColor('Blue')
                 .setFooter({ text: footer, iconURL: logo });
 
+            const sentMessage = await message.channel.send({ embeds: [lyricsEmbed] });
+
             syncedLyrics.onChange(async (lyrics, timestamp) => {
                 lyricsEmbed.setDescription(`[${timestamp}]: ${lyrics}`);
-                await message.channel.send({ embeds: [lyricsEmbed] });
+                await sentMessage.edit({ embeds: [lyricsEmbed] });
             });
             syncedLyrics.subscribe();
 
@@ -98,7 +100,7 @@ module.exports = {
             const initialLyrics = syncedLyrics.at(0);
             if (initialLyrics) {
                 lyricsEmbed.setDescription(`${initialLyrics}`);
-                await message.channel.send({ embeds: [lyricsEmbed] });
+                await sentMessage.edit({ embeds: [lyricsEmbed] });
             }
         } catch (error) {
             console.error('Error in lyrics command:', error);
