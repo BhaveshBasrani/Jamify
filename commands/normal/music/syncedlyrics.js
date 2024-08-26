@@ -83,18 +83,22 @@ module.exports = {
                 return message.channel.send({ embeds: [errorEmbed] });
             }
 
+            const lyricsEmbed = new EmbedBuilder()
+                .setTitle(`**Live** Lyrics for ${track.title} by ${track.author}`)
+                .setColor('Blue')
+                .setFooter({ text: footer, iconURL: logo });
+
             syncedLyrics.onChange(async (lyrics, timestamp) => {
-                await message.channel.send({
-                    content: `[${timestamp}]: ${lyrics}`
-                });
+                lyricsEmbed.setDescription(`[${timestamp}]: ${lyrics}`);
+                await message.channel.send({ embeds: [lyricsEmbed] });
             });
             syncedLyrics.subscribe();
+
             // Send initial lyrics
             const initialLyrics = syncedLyrics.at(0);
             if (initialLyrics) {
-                await message.channel.send({
-                    content: `[0]: ${initialLyrics}`
-                });
+                lyricsEmbed.setDescription(`${initialLyrics}`);
+                await message.channel.send({ embeds: [lyricsEmbed] });
             }
         } catch (error) {
             console.error('Error in lyrics command:', error);
