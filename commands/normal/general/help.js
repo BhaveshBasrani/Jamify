@@ -1,4 +1,4 @@
-const { EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder } = require('discord.js');
+const { EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder, ComponentType } = require('discord.js');
 const { banner, logo, footer } = require('../../../config.json');
 
 module.exports = {
@@ -42,7 +42,7 @@ module.exports = {
     }
 
     const collector = msg.createMessageComponentCollector({
-      componentType: 'SELECT_MENU',
+      componentType: ComponentType.StringSelect, // Corrected componentType
       time: 3_600_000,
     });
 
@@ -69,11 +69,11 @@ module.exports = {
           { name: 'Use command', value: '`!command_name` to use any command', inline: false },
         );
 
-      await interaction.update({ embeds: [categoryEmbed] });
+      await interaction.update({ embeds: [categoryEmbed] }); // Update interaction with the new embed
     });
 
     collector.on('end', async () => {
-      await msg.edit({ components: [] });
+      await msg.edit({ components: [] }); // Remove components after the collector ends
     });
   },
 };
