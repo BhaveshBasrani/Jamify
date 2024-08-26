@@ -9,19 +9,20 @@ module.exports = {
   async execute(message) {
     const { commands } = message.client;
 
-    const categories = [...new Set(commands.filter(cmd => cmd.category).map(cmd => cmd.category))];
+    const uniqueCommands = [...new Set(commands.map(cmd => cmd.name))];
+const categories = [...new Set(uniqueCommands.map(cmd => commands.find(c => c.name === cmd).category))];
 
-    const selectMenu = new StringSelectMenuBuilder()
-      .setCustomId('help-menu')
-      .setPlaceholder('Select a category')
-      .addOptions(
-        categories.map(category => 
-          new StringSelectMenuOptionBuilder()
-            .setLabel(category.charAt(0).toUpperCase() + category.slice(1))
-            .setValue(category)
-            .setDescription(`View ${category} commands`)
-        )
-      );
+const selectMenu = new StringSelectMenuBuilder()
+  .setCustomId('help-menu')
+  .setPlaceholder('Select a category')
+  .addOptions(
+    categories.map(category => 
+      new StringSelectMenuOptionBuilder()
+        .setLabel(category.charAt(0).toUpperCase() + category.slice(1))
+        .setValue(category)
+        .setDescription(`View ${category} commands`)
+    )
+  );
 
     const embed = new EmbedBuilder()
       .setTitle('📜 Help Menu')
@@ -48,10 +49,12 @@ module.exports = {
 
     collector.on('collect', async interaction => {
       if (interaction.customId !== 'help-menu') return;
-
-      const category = interaction.values[0];
-      let categoryCommands = commands.filter(cmd => cmd.category === category).map(cmd => `**${cmd.name}**: ${cmd.description}`).join('\n');
-
+      
+      const categoryCommands = uniqueCommands
+      .filter(cmd => commands.find(c => c.name === cmd).category === category)
+      .map(cmd => `**${cmd}**: ${commands.find(c => c.name === cmd).description}`)
+      .join('\n');
+      
       if (categoryCommands.length > 2048) {
         categoryCommands = categoryCommands.substring(0, 2045) + '...';
       }
