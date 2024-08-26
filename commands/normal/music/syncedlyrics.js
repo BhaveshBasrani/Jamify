@@ -83,14 +83,12 @@ module.exports = {
                 return message.channel.send({ embeds: [errorEmbed] });
             }
 
-            syncedLyrics.subscribe();
-
             syncedLyrics.onChange(async (lyrics, timestamp) => {
                 await message.channel.send({
                     content: `[${timestamp}]: ${lyrics}`
                 });
             });
-
+            syncedLyrics.subscribe();
             // Send initial lyrics
             const initialLyrics = syncedLyrics.at(0);
             if (initialLyrics) {

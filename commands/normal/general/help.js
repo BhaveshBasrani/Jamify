@@ -1,17 +1,17 @@
-const { EmbedBuilder, SelectMenuBuilder, ActionRowBuilder } = require('discord.js');
+const { EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder } = require('discord.js');
 const { banner, logo, footer } = require('../../../config.json');
 
 module.exports = {
   name: 'help',
   description: 'Displays all the commands and details about them.',
   category: 'general',
-  aliases: ['h','he','hel'],
+  aliases: ['h', 'he', 'hel'],
   async execute(message) {
     const { commands } = message.client;
 
     const categories = [...new Set(commands.map(cmd => cmd.category))];
 
-    const selectMenu = new SelectMenuBuilder()
+    const selectMenu = new StringSelectMenuBuilder()
       .setCustomId('help-menu')
       .setPlaceholder('Select a category')
       .addOptions(
@@ -34,7 +34,7 @@ module.exports = {
     const msg = await message.channel.send({ embeds: [embed], components: [row] });
 
     const collector = msg.createMessageComponentCollector({
-      componentType: 3,
+      componentType: 'SELECT_MENU',
       time: 60000,
     });
 
@@ -51,7 +51,8 @@ module.exports = {
         .setImage(banner)
         .setFooter({ text: footer, iconURL: logo });
 
-      await interaction.update({ embeds: [categoryEmbed] });
+      await interaction.deferUpdate();
+      await interaction.editReply({ embeds: [categoryEmbed] });
     });
 
     collector.on('end', async () => {
