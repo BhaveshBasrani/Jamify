@@ -1,16 +1,24 @@
-const { prefix } = require('../config.json');
+const ServerSettings = require('../models/ServerSettings');
 
 module.exports = {
     name: 'messageCreate',
-    execute(message, client) {
-        if (!message.content.startsWith(prefix) || message.author.bot) return;
+    async execute(message, client) {
+        if (message.author.bot) return;
+
+        // Fetch server settings from the database
+        const serverSettings = await ServerSettings.findOne({ guildId: message.guild.id });
+
+        // Use the default prefix if no custom prefix is set
+        const prefix = serverSettings ? serverSettings.prefix.text : require('../config.json').prefix;
+
+        if (!message.content.startsWith(prefix)) return;
 
         const args = message.content.slice(prefix.length).trim().split(/ +/);
         const commandName = args.shift().toLowerCase();
 
-        if (!client.commands.has(commandName)) return;
+        const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
-        const command = client.commands.get(commandName);
+        if (!command) return;
 
         try {
             command.execute(message, args);

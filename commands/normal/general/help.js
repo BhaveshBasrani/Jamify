@@ -1,4 +1,4 @@
-const { EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder } = require('discord.js');
+const { EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder } = require('discord.js');
 const { banner, logo, footer } = require('../../../config.json');
 
 module.exports = {
@@ -9,51 +9,67 @@ module.exports = {
   async execute(message) {
     const { commands } = message.client;
 
-    // Filter out commands without a category
     const categories = [...new Set(commands.filter(cmd => cmd.category).map(cmd => cmd.category))];
 
     const selectMenu = new StringSelectMenuBuilder()
       .setCustomId('help-menu')
       .setPlaceholder('Select a category')
       .addOptions(
-        categories.map(category => ({
-          label: category.charAt(0).toUpperCase() + category.slice(1),
-          description: `View ${category} commands`,
-          value: category,
-        })),
+        categories.map(category => 
+          new StringSelectMenuOptionBuilder()
+            .setLabel(category.charAt(0).toUpperCase() + category.slice(1))
+            .setValue(category)
+            .setDescription(`View ${category} commands`)
+        )
       );
 
     const embed = new EmbedBuilder()
-      .setTitle('Help')
-      .setDescription('Select a category to view its commands')
-      .setColor(0x0099FF)
+      .setTitle('📜 Help Menu')
+      .setDescription('Select a category to view its commands.')
+      .setColor(0x1E90FF)
       .setImage(banner)
-      .setFooter({ text: footer, iconURL: logo });
+      .setFooter({ text: footer, iconURL: logo })
+      .setTimestamp();
 
     const row = new ActionRowBuilder().addComponents(selectMenu);
 
-    const msg = await message.channel.send({ embeds: [embed], components: [row] });
+    let msg;
+    try {
+      msg = await message.channel.send({ embeds: [embed], components: [row] });
+    } catch (error) {
+      console.error('Error sending help menu:', error);
+      return;
+    }
 
     const collector = msg.createMessageComponentCollector({
       componentType: 'SELECT_MENU',
-      time: 60000,
+      time: 3_600_000,
     });
 
     collector.on('collect', async interaction => {
       if (interaction.customId !== 'help-menu') return;
 
       const category = interaction.values[0];
-      const categoryCommands = commands.filter(cmd => cmd.category === category).map(cmd => `**${cmd.name}**: ${cmd.description}`).join('\n');
+      let categoryCommands = commands.filter(cmd => cmd.category === category).map(cmd => `**${cmd.name}**: ${cmd.description}`).join('\n');
+
+      if (categoryCommands.length > 2048) {
+        categoryCommands = categoryCommands.substring(0, 2045) + '...';
+      }
 
       const categoryEmbed = new EmbedBuilder()
-        .setTitle(`${category.charAt(0).toUpperCase() + category.slice(1)} Commands`)
+        .setTitle(`🗂️ ${category.charAt(0).toUpperCase() + category.slice(1)} Commands`)
         .setDescription(categoryCommands || 'No commands available')
-        .setColor(0x0099FF)
+        .setColor(0x32CD32)
         .setImage(banner)
-        .setFooter({ text: footer, iconURL: logo });
+        .setFooter({ text: footer, iconURL: logo })
+        .setTimestamp()
+        .addFields(
+          { name: 'Category', value: category.charAt(0).toUpperCase() + category.slice(1), inline: true },
+          { name: 'Number of Commands', value: `${commands.filter(cmd => cmd.category === category).length}`, inline: true },
+          { name: 'Use command', value: '`!command_name` to use any command', inline: false },
+        );
 
-      await interaction.deferUpdate();
-      await interaction.editReply({ embeds: [categoryEmbed] });
+      await interaction.update({ embeds: [categoryEmbed] });
     });
 
     collector.on('end', async () => {

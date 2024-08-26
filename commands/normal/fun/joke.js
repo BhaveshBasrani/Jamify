@@ -12,7 +12,7 @@ module.exports = {
     try {
       const response = await fetch('https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,religious,political');
       const data = await response.json();
-      console.log('Joke fetched successfully');
+      console.log('Joke fetched successfully.');
 
       // Create an embed
       const jokeEmbed = new EmbedBuilder()

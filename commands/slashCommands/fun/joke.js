@@ -10,7 +10,7 @@ module.exports = {
     try {
       const response = await fetch('https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw');
       const data = await response.json();
-      console.log('Joke fetched successfully:', data);
+      console.log('Joke fetched successfully');
 
       // Check if it's a single joke or a two-part setup/delivery
       if (data.type === 'single') {

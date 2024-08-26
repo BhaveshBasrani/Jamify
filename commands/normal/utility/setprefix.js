@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const ServerSettings = require('../../../models/ServerSettings.js');
-const { banner, logo, footer } = require('../../../config.json')
+const { banner, logo, footer } = require('../../../config.json');
 const { PermissionsBitField } = require('discord.js');
 
 module.exports = {
@@ -19,7 +19,7 @@ module.exports = {
 
         await ServerSettings.findOneAndUpdate(
             { guildId: message.guild.id },
-            { prefix: newPrefix },
+            { prefix: { text: newPrefix } },
             { new: true, upsert: true }
         );
 

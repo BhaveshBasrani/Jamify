@@ -5,7 +5,8 @@ const { SpotifyExtractor } = require('@discord-player/extractor');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
-const { token, mongodb, banner, logo, footer, prefix, auth } = require('./config.json');
+const ServerSettings = require('./models/ServerSettings.js');
+const { token, mongodb, banner, logo, footer, auth } = require('./config.json');
 const commandHandler = require('./handlers/commandHandler.js');
 
 const client = new Client({
@@ -91,21 +92,31 @@ for (const file of eventFiles) {
 }
 
 // Invoke the command handler to log command information
+// Invoke the command handler to log command information
 commandHandler(client);
 
 client.on('messageCreate', async (message) => {
     if (message.type !== 0 || message.author.bot) return;
 
-    if (message.content.toLowerCase() === `<@${client.user.id}>` || message.content.toLowerCase() === `<@!${client.user.id}>`) {
-        const embed = new EmbedBuilder()
-            .setTitle('Heyy!!! Am Jamify')
-            .setDescription(`> My prefix in this server is ${prefix} Use ${prefix}help for more info.`)
-            .setColor('Blue')
-            .setImage(banner)
-            .setFooter({ text: footer, iconURL: logo });
+    const serverSettings = await ServerSettings.findOne({ guildId: message.guild.id });
 
-        message.channel.send({ embeds: [embed] });
-    }
+// Log the fetched server settings for debugging
+console.log('Server Settings:', serverSettings);
+
+// Use the default prefix if no custom prefix is set
+const prefix = serverSettings && serverSettings.prefix ? serverSettings.prefix : require('./config.json').prefix;
+
+
+if (message.content.toLowerCase() === `<@${client.user.id}>` || message.content.toLowerCase() === `<@!${client.user.id}>`) {
+    const embed = new EmbedBuilder()
+        .setTitle('Heyy!!! Am Jamify')
+        .setDescription(`My prefix in this server is \`${prefix}\`. Use ${prefix}help for more info.`)
+        .setColor('Blue')
+        .setImage(banner)
+        .setFooter({ text: footer, iconURL: logo });
+
+    message.channel.send({ embeds: [embed] });
+}
 });
 
 client.on('ready', () => {
