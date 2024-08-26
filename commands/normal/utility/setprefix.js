@@ -6,6 +6,7 @@ const { PermissionsBitField } = require('discord.js');
 module.exports = {
     name: 'setprefix',
     description: 'Sets a custom prefix for the server.',
+    category: 'utility',
     async execute(message, args) {
         if (!message.member.permissions.has([PermissionsBitField.Flags.Administrator])) {
             return message.reply('You do not have permission to use this command.');

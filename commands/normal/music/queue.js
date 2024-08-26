@@ -6,6 +6,7 @@ module.exports = {
     name: 'queue',
     description: 'Displays the current queue.',
     category: 'music',
+    aliases: ['qu', 'q', 'que'],
     async execute(message) {
         try {
             if (!message.guild) {

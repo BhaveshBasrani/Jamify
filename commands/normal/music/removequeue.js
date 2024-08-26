@@ -6,6 +6,7 @@ module.exports = {
     name: 'removequeue',
     description: 'Removes a song from the queue.',
     category: 'music',
+    aliases: ['rmq', 'rm' , 'rmque' , 'rmqu' ,'rmqueu' ],
     async execute(message, args) {
         const queue = await Queue.findOne({ guildId: message.guild.id });
         const nomusic =  new EmbedBuilder()

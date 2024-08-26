@@ -7,6 +7,7 @@ module.exports = {
     name: 'stop',
     description: 'Stops the current song and clears the queue.',
     category: 'music',
+    aliases: ['sto', 'st' , 's'],
     async execute(message) {
         const queue = useQueue(message.guild.id);
         if (!queue) {

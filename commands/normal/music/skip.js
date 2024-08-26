@@ -6,6 +6,7 @@ module.exports = {
   name: 'skip',
   description: 'Skips the current song.',
   category: 'music',
+  aliases: ['ski' , 'sk'],
   async execute(message) {
     const queue = useQueue(message.guild.id);
     if (!queue || !queue.currentTrack) {

@@ -6,6 +6,7 @@ module.exports = {
     name: 'search',
     description: 'Searches for a song.',
     category: 'music',
+    aliases: ['sear', 'ser' , 'se'],
     async execute(message, args) {
         const query = args.join(' ');
         

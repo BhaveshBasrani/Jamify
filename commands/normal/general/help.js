@@ -9,7 +9,8 @@ module.exports = {
   async execute(message) {
     const { commands } = message.client;
 
-    const categories = [...new Set(commands.map(cmd => cmd.category))];
+    // Filter out commands without a category
+    const categories = [...new Set(commands.filter(cmd => cmd.category).map(cmd => cmd.category))];
 
     const selectMenu = new StringSelectMenuBuilder()
       .setCustomId('help-menu')

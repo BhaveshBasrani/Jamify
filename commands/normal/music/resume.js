@@ -6,6 +6,7 @@ module.exports = {
     name: 'resume',
     description: 'Resumes the current song.',
     category: 'music',
+    aliases: ['r', 'resum' , 'res'],
     async execute(message) {
         const queue = useQueue(message.guild.id);
         if (!queue) {
