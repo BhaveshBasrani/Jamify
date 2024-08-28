@@ -1,5 +1,5 @@
 const { Client, GatewayIntentBits, Collection, EmbedBuilder } = require('discord.js');
-const { Player } = require('discord-player');
+const { Player , useMainPlayer} = require('discord-player');
 const { YoutubeiExtractor, createYoutubeiStream } = require("discord-player-youtubei");
 const { SpotifyExtractor } = require('@discord-player/extractor');
 const mongoose = require('mongoose');
@@ -27,25 +27,44 @@ client.player = new Player(client, {
     }
 });
 
-client.player.extractors.register(YoutubeiExtractor, {
+const player = useMainPlayer();
+
+player.extractors.register(YoutubeiExtractor, {
     authentication: auth,
     streamOptions: {
       useClient: "ANDROID"}
 });
-client.player.extractors.register(SpotifyExtractor, {
+player.extractors.register(SpotifyExtractor, {
     createStream: createYoutubeiStream
 });
 
-client.player.on('error', (error) => {
-    console.error(`Error emitted from the queue: ${error.message}`);
+player.events.on('audioTracksAdd', (queue) => {
+    // Emitted when the player adds multiple songs to its queue
+    queue.metadata.send(`Multiple Track's queued`);
 });
 
-client.player.on('playerError', (error) => {
-    console.error(`Error emitted from the player: ${error.message}`);
+player.events.on('playerSkip', (queue, track) => {
+    // Emitted when the audio player fails to load the stream for a song
+    queue.metadata.send(`Skipping **${track.title}** due to an issue!`);
 });
 
-client.player.on('skip', (queue) => {
-    console.log(`Skipped the current song in guild ${queue.guild.id}`);
+player.events.on('emptyChannel', (queue) => {
+    // Bot will automatically leave the voice channel with this event
+    queue.metadata.send(`Leaving because no vc activity for the past 5 minutes`);
+});
+player.events.on('emptyQueue', (queue) => {
+    // Emitted when the player queue has finished
+    queue.metadata.send('Queue finished!');
+});
+player.events.on('error', (queue, error) => {
+    // Emitted when the player queue encounters error
+    console.log(`General player error event: ${error.message}`);
+    console.log(error);
+});
+player.events.on('playerError', (queue, error) => {
+    // Emitted when the audio player errors while streaming audio track
+    console.log(`Player error event: ${error.message}`);
+    console.log(error);
 });
 
 // Connect to MongoDB
@@ -91,8 +110,6 @@ for (const file of eventFiles) {
     }
 }
 
-// Invoke the command handler to log command information
-// Invoke the command handler to log command information
 commandHandler(client);
 
 client.on('messageCreate', async (message) => {

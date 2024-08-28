@@ -50,10 +50,14 @@ const selectMenu = new StringSelectMenuBuilder()
     collector.on('collect', async interaction => {
       if (interaction.customId !== 'help-menu') return;
       
-      const categoryCommands = uniqueCommands
-      .filter(cmd => commands.find(c => c.name === cmd).category === category)
-      .map(cmd => `**${cmd}**: ${commands.find(c => c.name === cmd).description}`)
-      .join('\n');
+      const category = interaction.values[0]; // Add this line to define the category variable
+      let categoryCommands = uniqueCommands
+        .filter(cmd => {
+          const cmdObj = commands.find(c => c.name === cmd);
+          return cmdObj && cmdObj.category === category;
+        })
+        .map(cmd => `**${cmd}**: ${commands.find(c => c.name === cmd).description}`)
+        .join('\n');
       
       if (categoryCommands.length > 2048) {
         categoryCommands = categoryCommands.substring(0, 2045) + '...';
