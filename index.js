@@ -1,5 +1,5 @@
 const { Client, GatewayIntentBits, Collection, EmbedBuilder } = require('discord.js');
-const { Player , useMainPlayer} = require('discord-player');
+const { Player, useMainPlayer } = require('discord-player');
 const { YoutubeiExtractor, createYoutubeiStream } = require("discord-player-youtubei");
 const { SpotifyExtractor } = require('@discord-player/extractor');
 const mongoose = require('mongoose');
@@ -32,47 +32,50 @@ const player = useMainPlayer();
 player.extractors.register(YoutubeiExtractor, {
     authentication: auth,
     streamOptions: {
-      useClient: "ANDROID"}
+        useClient: "ANDROID"
+    }
 });
 player.extractors.register(SpotifyExtractor, {
     createStream: createYoutubeiStream
 });
 
 player.events.on('audioTracksAdd', (queue) => {
-    // Emitted when the player adds multiple songs to its queue
-    queue.metadata.send(`Multiple Track's queued`);
+    queue.metadata.channel.send(`Multiple Track's queued`);
 });
 
 player.events.on('playerSkip', (queue, track) => {
-    // Emitted when the audio player fails to load the stream for a song
-    queue.metadata.send(`Skipping **${track.title}** due to an issue!`);
+    queue.metadata.channel.send(`Skipping **${track.title}** due to an issue!`);
 });
 
 player.events.on('emptyChannel', (queue) => {
-    // Bot will automatically leave the voice channel with this event
-    queue.metadata.send(`Leaving because no vc activity for the past 5 minutes`);
+    queue.metadata.channel.send(`Leaving because no vc activity for the past 5 minutes`);
 });
+
 player.events.on('emptyQueue', (queue) => {
-    // Emitted when the player queue has finished
-    queue.metadata.send('Queue finished!');
+    queue.metadata.channel.send('Queue finished!');
 });
-player.events.on('error', (queue, error) => {
-    // Emitted when the player queue encounters error
+
+player.events.on('error', (error) => {
     console.log(`General player error event: ${error.message}`);
     console.log(error);
 });
-player.events.on('playerError', (queue, error) => {
-    // Emitted when the audio player errors while streaming audio track
+
+player.events.on('playerError', (error) => {
     console.log(`Player error event: ${error.message}`);
     console.log(error);
+});
+
+player.events.on('playerFinish', async (queue, track) => {
+    const playerFinishHandler = require('./events/playerFinish');
+    await playerFinishHandler.execute(queue, track, client);
 });
 
 // Connect to MongoDB
 mongoose.connect(mongodb, {
     authSource: 'admin', // Specify the authentication database if needed
 })
-   .then(() => console.log('Connected to MongoDB'))
-   .catch(err => console.error('Failed to connect to MongoDB', err));
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.error('Failed to connect to MongoDB', err));
 
 // Load normal commands
 const commandFolders = fs.readdirSync(path.join(__dirname, 'commands/normal'));
@@ -114,22 +117,19 @@ commandHandler(client);
 
 client.on('messageCreate', async (message) => {
     if (message.type !== 0 || message.author.bot) return;
+    const serverSettings = await ServerSettings.findOne({ guildId: message.guild.id });
+    const prefix = serverSettings && serverSettings.prefix ? serverSettings.prefix : require('./config.json').prefix;
 
-const serverSettings = await ServerSettings.findOne({ guildId: message.guild.id });
-// Use the default prefix if no custom prefix is set
-const prefix = serverSettings && serverSettings.prefix ? serverSettings.prefix : require('./config.json').prefix;
+    if (message.content.toLowerCase() === `<@${client.user.id}>` || message.content.toLowerCase() === `<@!${client.user.id}>`) {
+        const embed = new EmbedBuilder()
+            .setTitle('Heyy!!! Am Jamify')
+            .setDescription(`My prefix in this server is \`${prefix}\`. Use ${prefix}help for more info.`)
+            .setColor('Blue')
+            .setImage(banner)
+            .setFooter({ text: footer, iconURL: logo });
 
-
-if (message.content.toLowerCase() === `<@${client.user.id}>` || message.content.toLowerCase() === `<@!${client.user.id}>`) {
-    const embed = new EmbedBuilder()
-        .setTitle('Heyy!!! Am Jamify')
-        .setDescription(`My prefix in this server is \`${prefix}\`. Use ${prefix}help for more info.`)
-        .setColor('Blue')
-        .setImage(banner)
-        .setFooter({ text: footer, iconURL: logo });
-
-    message.channel.send({ embeds: [embed] });
-}
+        message.channel.send({ embeds: [embed] });
+    }
 });
 
 client.on('ready', () => {

@@ -34,7 +34,7 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setTitle('Current Queue')
                 .setImage(banner)
-                .setDescription(`Currently playing: ${currentTrack.title} - ${currentTrack.requestedBy}\n\n${limitedTracksString || 'No more songs in the queue!'}`)
+                .setDescription(`**Currently playing:** ${currentTrack.title} - ${currentTrack.requestedBy}\n\n${limitedTracksString || 'No more songs in the queue!'}`)
                 .setColor('Green')
                 .setFooter({ text: footer, iconURL: logo });
 

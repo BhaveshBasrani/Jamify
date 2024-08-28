@@ -2,9 +2,9 @@ const { EmbedBuilder } = require('discord.js');
 const { banner, logo, footer } = require('../config.json');
 
 module.exports = {
-    name: 'playerEnd',
+    name: 'playerFinish',
     async execute(queue) {
-        console.log('queueEnd event triggered'); // Debug log
+        console.log('playerFinish event triggered'); // Debug log
 
         if (queue.tracks.length > 0) {
             console.log('Playing next song in queue...');
