@@ -1,6 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
 const { useQueue } = require('discord-player')
-const Queue = require('../../../models/queue.js')
 const { banner, footer, logo } = require('../../../config.json')
 
 module.exports = {
@@ -14,7 +13,6 @@ module.exports = {
             return message.reply('I am not currently playing music in this server.');
         }
         queue.delete();
-        await Queue.deleteOne({ guildId: message.guild.id });
 
         const embed = new EmbedBuilder()
             .setTitle('Music Stopped')

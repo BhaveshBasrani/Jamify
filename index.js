@@ -1,5 +1,5 @@
 const { Client, GatewayIntentBits, Collection, EmbedBuilder } = require('discord.js');
-const { Player, useMainPlayer } = require('discord-player');
+const { Player} = require('discord-player');
 const { YoutubeiExtractor, createYoutubeiStream } = require("discord-player-youtubei");
 const { SpotifyExtractor } = require('@discord-player/extractor');
 const mongoose = require('mongoose');
@@ -20,14 +20,9 @@ const client = new Client({
 
 client.commands = new Collection();
 client.slashCommands = new Collection();
-client.player = new Player(client, {
-    ytdlOptions: {
-        quality: 'highestaudio',
-        highWaterMark: 1 << 25
-    }
+const player = new Player(client, {
+   skipFFmpeg: false
 });
-
-const player = useMainPlayer();
 
 player.extractors.register(YoutubeiExtractor, {
     authentication: auth,
