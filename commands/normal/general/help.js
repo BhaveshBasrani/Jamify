@@ -10,19 +10,19 @@ module.exports = {
     const { commands } = message.client;
 
     const uniqueCommands = [...new Set(commands.map(cmd => cmd.name))];
-const categories = [...new Set(uniqueCommands.map(cmd => commands.find(c => c.name === cmd).category))];
+    const categories = [...new Set(uniqueCommands.map(cmd => commands.find(c => c.name === cmd).category).filter(category => category))];
 
-const selectMenu = new StringSelectMenuBuilder()
-  .setCustomId('help-menu')
-  .setPlaceholder('Select a category')
-  .addOptions(
-    categories.map(category => 
-      new StringSelectMenuOptionBuilder()
-        .setLabel(category.charAt(0).toUpperCase() + category.slice(1))
-        .setValue(category)
-        .setDescription(`View ${category} commands`)
-    )
-  );
+    const selectMenu = new StringSelectMenuBuilder()
+      .setCustomId('help-menu')
+      .setPlaceholder('Select a category')
+      .addOptions(
+        categories.map(category => 
+          new StringSelectMenuOptionBuilder()
+            .setLabel(category.charAt(0).toUpperCase() + category.slice(1))
+            .setValue(category)
+            .setDescription(`View ${category} commands`)
+        )
+      );
 
     const embed = new EmbedBuilder()
       .setTitle('📜 Help Menu')
@@ -43,14 +43,14 @@ const selectMenu = new StringSelectMenuBuilder()
     }
 
     const collector = msg.createMessageComponentCollector({
-      componentType: ComponentType.StringSelect, // Corrected componentType
+      componentType: ComponentType.StringSelect,
       time: 3_600_000,
     });
 
     collector.on('collect', async interaction => {
       if (interaction.customId !== 'help-menu') return;
       
-      const category = interaction.values[0]; // Add this line to define the category variable
+      const category = interaction.values[0];
       let categoryCommands = uniqueCommands
         .filter(cmd => {
           const cmdObj = commands.find(c => c.name === cmd);
@@ -63,6 +63,8 @@ const selectMenu = new StringSelectMenuBuilder()
         categoryCommands = categoryCommands.substring(0, 2045) + '...';
       }
 
+      const numberOfCommands = commands.filter(cmd => cmd.category === category).length;
+
       const categoryEmbed = new EmbedBuilder()
         .setTitle(`🗂️ ${category.charAt(0).toUpperCase() + category.slice(1)} Commands`)
         .setDescription(categoryCommands || 'No commands available')
@@ -72,15 +74,15 @@ const selectMenu = new StringSelectMenuBuilder()
         .setTimestamp()
         .addFields(
           { name: 'Category', value: category.charAt(0).toUpperCase() + category.slice(1), inline: true },
-          { name: 'Number of Commands', value: `${commands.filter(cmd => cmd.category === category).length}`, inline: true },
+          { name: 'Number of Commands', value: `${numberOfCommands}`, inline: true },
           { name: 'Use command', value: '`!command_name` to use any command', inline: false },
         );
 
-      await interaction.update({ embeds: [categoryEmbed] }); // Update interaction with the new embed
+      await interaction.update({ embeds: [categoryEmbed] });
     });
 
     collector.on('end', async () => {
-      await msg.edit({ components: [] }); // Remove components after the collector ends
+      await msg.edit({ components: [] });
     });
   },
 };
