@@ -1,42 +1,87 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { category } = require('./userinfo');
+const { SlashCommandBuilder, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder, ComponentType } = require('discord.js');
+const { banner, logo, footer } = require('../../../config.json');
 
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName('help')
-        .setDescription('Displays all the commands and details about them.')
-        .addStringOption(option => 
-            option.setName('category')
-                .setDescription('The category of commands to display')
-                .setRequired(false)
-                .addChoices(
-                    { name: 'fun', value: 'fun' },
-                    { name: 'general', value: 'general' },
-                    { name: 'utility', value: 'utility' }
-                )),
-    async execute(interaction) {
-        const { client } = interaction;
-        const category = interaction.options.getString('category');
+  data: new SlashCommandBuilder()
+    .setName('help')
+    .setDescription('Displays all the commands and details about them.'),
+  async execute(interaction) {
+    const { commands } = interaction.client;
 
-        const commands = client.commands;
+    const uniqueCommands = [...new Set(commands.map(cmd => cmd.name))];
+    const categories = [...new Set(uniqueCommands.map(cmd => commands.find(c => c.name === cmd).category).filter(category => category))];
 
-        const funCommands = commands.filter(cmd => cmd.category === 'fun').map(cmd => `**${cmd.name}**: ${cmd.description}`).join('\n');
-        const generalCommands = commands.filter(cmd => cmd.category === 'general').map(cmd => `**${cmd.name}**: ${cmd.description}`).join('\n');
-        const utilityCommands = commands.filter(cmd => cmd.category === 'utility').map(cmd => `**${cmd.name}**: ${cmd.description}`).join('\n');
+    const selectMenu = new StringSelectMenuBuilder()
+      .setCustomId('help-menu')
+      .setPlaceholder('Select a category')
+      .addOptions(
+        categories.map(category => 
+          new StringSelectMenuOptionBuilder()
+            .setLabel(category.charAt(0).toUpperCase() + category.slice(1))
+            .setValue(category)
+            .setDescription(`View ${category} commands`)
+        )
+      );
 
-        const embed = new EmbedBuilder()
-            .setTitle('Help')
-            .setDescription('Here are the available commands:')
-            .addFields(
-                { name: 'Fun Commands', value: funCommands || 'No commands available', inline: false },
-                { name: 'General Commands', value: generalCommands || 'No commands available', inline: false },
-                { name: 'Utility Commands', value: utilityCommands || 'No commands available', inline: false }
-            )
-            .setColor(0x0099FF)
-            .setImage('https://cdn.discordapp.com/attachments/1083025959659245578/1255924342836170782/standard.gif?ex=667ee631&is=667d94b1&hm=df73dbc902c6b853b57e7f324244e272bda2a84c471d7a2e567f698e68326e35&')
-            .setThumbnail('https://cdn.discordapp.com/attachments/1083025959659245578/1256226568997703790/e2e7d7f843961fdb91063a5dac128ccb.png?ex=667fffa9&is=667eae29&hm=17f714a7058d5c68e731d76e12fafa94cce4af9d0a2992ad4fad2a5b47af464c&')
-            .setFooter({ text: '© 2024 Jamify All rights reserved.', iconURL: 'https://cdn.discordapp.com/attachments/1083025959659245578/1256226568997703790/e2e7d7f843961fdb91063a5dac128ccb.png?ex=667fffa9&is=667eae29&hm=17f714a7058d5c68e731d76e12fafa94cce4af9d0a2992ad4fad2a5b47af464c&' });
+    const embed = new EmbedBuilder()
+      .setTitle('📜 Help Menu')
+      .setDescription('Select a category to view its commands.')
+      .setColor(0x1E90FF)
+      .setImage(banner)
+      .setFooter({ text: footer, iconURL: logo })
+      .setTimestamp();
 
-        await interaction.reply({ embeds: [embed] });
-    },
+    const row = new ActionRowBuilder().addComponents(selectMenu);
+
+    let msg;
+    try {
+      msg = await interaction.reply({ embeds: [embed], components: [row], fetchReply: true });
+    } catch (error) {
+      console.error('Error sending help menu:', error);
+      return;
+    }
+
+    const collector = msg.createMessageComponentCollector({
+      componentType: ComponentType.StringSelect,
+      time: 3_600_000,
+    });
+
+    collector.on('collect', async i => {
+      if (i.customId !== 'help-menu') return;
+      
+      const category = i.values[0];
+      let categoryCommands = uniqueCommands
+        .filter(cmd => {
+          const cmdObj = commands.find(c => c.name === cmd);
+          return cmdObj && cmdObj.category === category;
+        })
+        .map(cmd => `**${cmd}**: ${commands.find(c => c.name === cmd).description}`)
+        .join('\n');
+      
+      if (categoryCommands.length > 2048) {
+        categoryCommands = categoryCommands.substring(0, 2045) + '...';
+      }
+
+      const numberOfCommands = commands.filter(cmd => cmd.category === category).length;
+
+      const categoryEmbed = new EmbedBuilder()
+        .setTitle(`🗂️ ${category.charAt(0).toUpperCase() + category.slice(1)} Commands`)
+        .setDescription(categoryCommands || 'No commands available')
+        .setColor(0x32CD32)
+        .setImage(banner)
+        .setFooter({ text: footer, iconURL: logo })
+        .setTimestamp()
+        .addFields(
+          { name: 'Category', value: category.charAt(0).toUpperCase() + category.slice(1), inline: true },
+          { name: 'Number of Commands', value: `${numberOfCommands}`, inline: true },
+          { name: 'Use command', value: '`/command_name` to use any command', inline: false },
+        );
+
+      await i.update({ embeds: [categoryEmbed] });
+    });
+
+    collector.on('end', async () => {
+      await msg.edit({ components: [] });
+    });
+  },
 };
