@@ -1,4 +1,4 @@
-const { QueryType } = require('discord-player');
+const { QueryType, useMainPlayer } = require('discord-player');
 const { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
 const { banner, logo, footer } = require('../../../config.json')
 
@@ -8,13 +8,14 @@ module.exports = {
     category: 'music',
     aliases: ['sear', 'ser' , 'se'],
     async execute(message, args) {
+        const player = useMainPlayer();
         const query = args.join(' ');
         
         if (!query) {
             return message.reply('Please provide a song to search for.');
         }
 
-        const result = await message.client.player.search(query, {
+        const result = await player.search(query, {
             requestedBy: message.author,
             searchEngine: QueryType.SPOTIFY_SEARCH,
         });
@@ -56,11 +57,11 @@ module.exports = {
             const trackIndex = parseInt(i.values[0]);
             const track = tracks[trackIndex];
         
-            let queue = message.client.player.nodes.get(message.guild.id);
+            let queue = player.nodes.get(message.guild.id);
         
             if (!queue) {
                 try {
-                    queue = message.client.player.nodes.create(message.guild, {
+                    queue = player.nodes.create(message.guild, {
                         metadata: {
                             channel: message.channel
                         }
@@ -74,7 +75,7 @@ module.exports = {
         
             queue.addTrack(track);
         
-            if (!queue.playing) {
+            if (!queue.isPlaying()) {
                 await queue.play(track); // Play the track
             }
         

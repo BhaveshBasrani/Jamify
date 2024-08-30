@@ -1,26 +1,26 @@
-const { QueryType } = require('discord-player');
+const { QueryType, useMainPlayer, useQueue } = require('discord-player');
 const { EmbedBuilder } = require('discord.js');
-const Queue = require('../../../models/queue.js');
-const { logo, banner, footer } = require('../../../config.json')
+const { logo, banner, footer } = require('../../../config.json');
 
 module.exports = {
     name: 'addqueue',
     description: 'Adds a song to the queue.',
     category: 'music',
     async execute(message, args) {
+        const player = useMainPlayer();
         const query = args.join(' ');
         if (!query) {
             return message.reply('Please provide a song to add to the queue.');
         }
 
-        let queue = await Queue.findOne({ guildId: message.guild.id });
+        const queue = useQueue(message.guild.id);
         if (!queue) {
-            queue = new Queue({ guildId: message.guild.id, songs: [] });
+            return message.reply('No queue found for this guild.');
         }
 
         let result;
         try {
-            result = await message.client.player.search(query, {
+            result = await player.search(query, {
                 requestedBy: message.author,
                 searchEngine: QueryType.SPOTIFY_SEARCH,
             });
@@ -39,49 +39,12 @@ module.exports = {
             url: track.url,
             thumbnail: track.thumbnail,
             duration: track.duration,
-            requestedBy : track.requestedBy,
             requestedBy: message.author.username,
             channelId: message.channel.id,
             voiceChannelId: message.member.voice.channel.id
         };
 
-        queue.songs.push(song);
-        await queue.save();
-
-        const saveCurrentState = async (guildId, currentTrack, queue) => {
-            await Queue.updateOne(
-                { guildId },
-                { $set: { currentTrack, songs: queue.songs } },
-                { upsert: true }
-            );
-        };
-        
-        let node = message.client.player.nodes.get(message.guild.id);
-        if (!node) {
-            try {
-                node = await message.client.player.nodes.create(message.guild.id, {
-                    metadata: {
-                        channel: message.channel
-                    }
-                });
-                await node.connect(message.member.voice.channel);
-            } catch (error) {
-                console.error(error);
-                return message.reply('An error occurred while trying to connect to the voice channel.');
-            }
-        }
-        
-        if (!node.playing) {
-            try {
-                await node.play(track.url);
-                await saveCurrentState(message.guild.id, song, queue);
-            } catch (error) {
-                console.error(error);
-                return message.reply('An error occurred while trying to play the track.');
-            }
-        } else {
-            queue.songs.push(song);
-        }
+        queue.insertTrack(track, queue.tracks.length);
 
         const embed = new EmbedBuilder()
             .setTitle('Song Added to Queue')
@@ -89,7 +52,7 @@ module.exports = {
             .setColor('Blue')
             .addFields({
                 name: '**Position in Queue**',
-                value: `${queue.songs.indexOf(song) + 1} of ${queue.songs.length}`,
+                value: `${queue.tracks.indexOf(track) + 1} of ${queue.tracks.length}`,
                 inline: true,
               },
               {

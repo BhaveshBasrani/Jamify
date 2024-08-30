@@ -1,4 +1,4 @@
-const { QueryType, useQueue } = require('discord-player');
+const { QueryType, useQueue, useMainPlayer } = require('discord-player');
 const { EmbedBuilder } = require('discord.js');
 const { logo, footer } = require('../../../config.json');
 const { ClassicPro, Dynamic } = require('musicard');
@@ -10,6 +10,7 @@ module.exports = {
   category: 'music',
   async execute(message, args) {
     const query = args.join(' ');
+    const player = useMainPlayer();
     if (!query) {
       const embed = new EmbedBuilder()
         .setTitle('❌ Error')
@@ -31,7 +32,7 @@ module.exports = {
       return message.reply({ embeds: [embed] });
     }
 
-    if (!message.client.player) {
+    if (!player) {
       const embed = new EmbedBuilder()
         .setTitle('❌ Error')
         .setDescription('Player is not initialized or ready.')
@@ -42,7 +43,7 @@ module.exports = {
     }
 
     try {
-      const result = await message.client.player.search(query, {
+      const result = await player.search(query, {
         requestedBy: message.author,
         searchEngine: QueryType.SPOTIFY_SEARCH,
       });
@@ -61,7 +62,7 @@ module.exports = {
 
       if (!queue) {
         try {
-            queue = message.client.player.nodes.create(message.guild, {
+            queue = player.nodes.create(message.guild, {
                 metadata: {
                     channel: message.channel
                 }

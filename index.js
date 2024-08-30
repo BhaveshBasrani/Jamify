@@ -20,47 +20,47 @@ const client = new Client({
 
 client.commands = new Collection();
 client.slashCommands = new Collection();
-const player = new Player(client, {
+client.player = new Player(client, {
    skipFFmpeg: false
 });
 
-player.extractors.register(YoutubeiExtractor, {
+client.player.extractors.register(YoutubeiExtractor, {
     authentication: auth,
     streamOptions: {
         useClient: "ANDROID"
     }
 });
-player.extractors.register(SpotifyExtractor, {
+client.player.extractors.register(SpotifyExtractor, {
     createStream: createYoutubeiStream
 });
 
-player.events.on('audioTracksAdd', (queue) => {
+client.player.events.on('audioTracksAdd', (queue) => {
     queue.metadata.channel.send(`Multiple Track's queued`);
 });
 
-player.events.on('playerSkip', (queue, track) => {
+client.player.events.on('playerSkip', (queue, track) => {
     queue.metadata.channel.send(`Skipping **${track.title}** due to an issue!`);
 });
 
-player.events.on('emptyChannel', (queue) => {
+client.player.events.on('emptyChannel', (queue) => {
     queue.metadata.channel.send(`Leaving because no vc activity for the past 5 minutes`);
 });
 
-player.events.on('emptyQueue', (queue) => {
+client.player.events.on('emptyQueue', (queue) => {
     queue.metadata.channel.send('Queue finished!');
 });
 
-player.events.on('error', (error) => {
+client.player.events.on('error', (error) => {
     console.log(`General player error event: ${error.message}`);
     console.log(error);
 });
 
-player.events.on('playerError', (error) => {
+client.player.events.on('playerError', (error) => {
     console.log(`Player error event: ${error.message}`);
     console.log(error);
 });
 
-player.events.on('playerFinish', async (queue, track) => {
+client.player.events.on('playerFinish', async (queue, track) => {
     const playerFinishHandler = require('./events/playerFinish');
     await playerFinishHandler.execute(queue, track, client);
 });
