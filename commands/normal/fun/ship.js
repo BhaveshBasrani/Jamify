@@ -45,7 +45,7 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setTitle('MATCHMAKING 💕')
-      .setDescription(`${user1.username} ❤️ ${user2.username}`)
+      .setDescription(`<@${user1.id}> ❤️ <@${user2.id}>`)
       .addFields(
         { name: 'Ship Name', value: shipName, inline: true },
         { name: 'Match Percentage', value: `${shipPercentage}%`, inline: true },
