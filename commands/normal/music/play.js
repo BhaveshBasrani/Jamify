@@ -77,7 +77,7 @@ module.exports = {
       const track = result.tracks[0];
 
       if (result.playlist) {
-        queue.addTracks(result.tracks);
+        queue.addTrack(result.tracks);
       } else {
         queue.addTrack(track);
       }

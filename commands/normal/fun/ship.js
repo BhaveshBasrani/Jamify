@@ -1,18 +1,12 @@
 const { EmbedBuilder } = require('discord.js');
-const { Canvas, Image } = require('canvas');
-let got;
-(async () => {
-  const { default: _got } = await import('got');
-  got = _got;
-})();
-
+const canvafy = require('canvafy');
 const { footer, logo } = require('../../../config.json');
 
 module.exports = {
   name: 'ship',
   description: 'Ship two users together.',
   category: 'fun',
-  aliases: ['sh','s','shi'],
+  aliases: ['sh', 's', 'shi'],
   async execute(message, args) {
     if (args.length < 2) {
       return message.reply('Please mention two users to ship.');
@@ -39,54 +33,28 @@ module.exports = {
       description = 'Not looking too good... 😕';
     }
 
-    const canvas = new Canvas(200, 100);
-    const ctx = canvas.getContext('2d');
+    const ship = await new canvafy.Ship()
+      .setAvatars(user1.displayAvatarURL({ forceStatic: true, extension: 'png' }), user2.displayAvatarURL({ forceStatic: true, extension: 'png' }))
+      .setBackground('image', 'https://static.zerochan.net/Hotch.Kiss.full.1004294.jpg')
+      .setBorder('#C658E5')
+      .setCustomNumber(shipPercentage)
+      .setOverlayOpacity(0.5)
+      .build();
 
-    // Load user avatars
-const avatar1Response = await got(user1.displayAvatarURL({ format: 'png' }));
-const avatar1Buffer = avatar1Response.body;
-const avatar1 = new Image();
-avatar1.onload = () => {
-  // Draw avatars side by side
-  ctx.drawImage(avatar1, 0, 0, 50, 100);
+      const buffer = Buffer.from(ship);
 
-  // Draw heart in the middle
-  ctx.fillStyle = 'ed';
-  ctx.font = 'bold 40px Arial';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'iddle';
-  ctx.fillText('❤️', 100, 50);
+    const embed = new EmbedBuilder()
+      .setTitle('MATCHMAKING 💕')
+      .setDescription(`${user1.username} ❤️ ${user2.username}`)
+      .addFields(
+        { name: 'Ship Name', value: shipName, inline: true },
+        { name: 'Match Percentage', value: `${shipPercentage}%`, inline: true },
+        { name: 'Description', value: description }
+      )
+      .setImage('attachment://ship.png')
+      .setColor('#C658E5')
+      .setFooter({ text: footer, iconURL: logo });
 
-  // Get the image buffer
-  const imageBuffer = canvas.toBuffer();
-
-  // Convert the image buffer to a base64 string
-  const imageBase64 = `data:image/png;base64,${imageBuffer.toString('base64')}`;
-
-  // Create the embed
-  const embed = new EmbedBuilder()
-   .setTitle('MATCHMAKING 💕')
-   .setDescription(`${user1.username} ❤️ ${user2.username}`)
-   .addFields(
-      { name: 'Ship Name', value: shipName, inline: true },
-      { name: 'Match Percentage', value: `${shipPercentage}%`, inline: true },
-      { name: 'Description', value: description }
-    )
-   .setImage(imageBase64)
-   .setColor('Pink')
-   .setFooter({ text: footer, iconURL: logo });
-
-  // Send the message with the embed
-  message.channel.send({ embeds: [embed] });
-};
-avatar1.src = avatar1Buffer;
-
-const avatar2Response = await got(user2.displayAvatarURL({ format: 'png' }));
-const avatar2Buffer = avatar2Response.body;
-const avatar2 = new Image();
-avatar2.onload = () => {
-  ctx.drawImage(avatar2, 150, 0, 50, 100);
-};
-avatar2.src = avatar2Buffer;
+    message.channel.send({ embeds: [embed], files: [{ attachment: buffer, name: 'ship.png' }] });
   }
 };
