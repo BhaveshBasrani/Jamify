@@ -114,45 +114,41 @@ module.exports = {
       } else {
         queue.node.play(track);
 
-        const updateCard = async () => {
-          const musicard = await ClassicPro({
-            thumbnailImage: track.thumbnail || '',
-            backgroundColor: '#070707',
-            progress: track.duration || '',
-            progressColor: '#FF7A00',
-            progressBarColor: '#5F2D00',
-            name: track.title || 'Unknown Title',
-            nameColor: '#FF7A00',
-            author: track.author || 'Unknown Author',
-            authorColor: '#696969',
-            startTime: '0:00',
-            endTime: track.duration || 'Unknown Duration',
-            timeColor: '#FF7A00',
-          });
+        const musicard = await ClassicPro({
+          thumbnailImage: track.thumbnail || '',
+          backgroundColor: '#070707',
+          progress: track.duration || '',
+          progressColor: '#FF7A00',
+          progressBarColor: '#5F2D00',
+          name: track.title || 'Unknown Title',
+          nameColor: '#FF7A00',
+          author: track.author || 'Unknown Author',
+          authorColor: '#696969',
+          startTime: '0:00',
+          endTime: track.duration || 'Unknown Duration',
+          timeColor: '#FF7A00',
+        });
 
-          const buffer = Buffer.from(musicard);
+        const buffer = Buffer.from(musicard);
 
-          const nowPlayingEmbed = new EmbedBuilder()
-            .setTitle('🎶 Now Playing')
-            .setAuthor({ name: 'Jamify', iconURL: logo })
-            .setDescription(`**${track.title || 'Unknown Title'}** by **${track.author || 'Unknown Author'}**`)
-            .setColor('Blue')
-            .setImage('attachment://musicard.png')
-            .setFooter({ text: footer })
-            .addFields(
-              { name: '⏱ Duration', value: `${track.duration || 'Unknown Duration'}`, inline: true },
-              { name: '🙋 Requested By', value: `${message.author}`, inline: true }
-            );
+        const nowPlayingEmbed = new EmbedBuilder()
+          .setTitle('🎶 Now Playing')
+          .setAuthor({ name: 'Jamify', iconURL: logo })
+          .setDescription(`**${track.title || 'Unknown Title'}** by **${track.author || 'Unknown Author'}**`)
+          .setColor('Blue')
+          .setImage('attachment://musicard.png')
+          .setFooter({ text: footer })
+          .addFields(
+            { name: '⏱ Duration', value: `${track.duration || 'Unknown Duration'}`, inline: true },
+            { name: '🙋 Requested By', value: `${message.author}`, inline: true }
+          );
 
-          const messageOptions = {
-            embeds: [nowPlayingEmbed],
-            files: [{ attachment: buffer, name: 'musicard.png' }],
-          };
-
-          message.channel.send(messageOptions);
+        const messageOptions = {
+          embeds: [nowPlayingEmbed],
+          files: [{ attachment: buffer, name: 'musicard.png' }],
         };
 
-        updateCard();
+        message.channel.send(messageOptions);
       }
 
     } catch (error) {
