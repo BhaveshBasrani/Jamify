@@ -10,9 +10,8 @@ module.exports = {
     async execute(message) {
         try {
             const queue = useQueue(message.guild.id);
-            const player = useMainPlayer();
-
-            if (!queue || !player) {
+           const player = useMainPlayer()
+            if (!player) {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
                     .setDescription('Player or queue is not initialized.')
@@ -33,7 +32,6 @@ module.exports = {
             }
 
             const track = queue.currentTrack;
-            console.log(`${track.title} ${track.author}`)
 
             if (!track) {
                 const errorEmbed = new EmbedBuilder()

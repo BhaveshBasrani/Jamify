@@ -1,4 +1,3 @@
-// reminderHandler.js
 const { Collection } = require('discord.js');
 
 module.exports = class ReminderHandler {

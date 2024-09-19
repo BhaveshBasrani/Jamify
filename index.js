@@ -1,5 +1,5 @@
-const { Client, GatewayIntentBits, Collection, EmbedBuilder } = require('discord.js');
-const { Player} = require('discord-player');
+const { Client, GatewayIntentBits, Collection, EmbedBuilder, Events } = require('discord.js');
+const { Player } = require('discord-player');
 const { YoutubeiExtractor, createYoutubeiStream } = require("discord-player-youtubei");
 const { SpotifyExtractor } = require('@discord-player/extractor');
 const mongoose = require('mongoose');
@@ -8,13 +8,15 @@ const path = require('path');
 const ServerSettings = require('./models/ServerSettings.js');
 const { token, mongodb, banner, logo, footer, auth } = require('./config.json');
 const commandHandler = require('./handlers/commandHandler.js');
+const afkCommand = require('./commands/normal/fun/afk.js'); // Path to the AFK command
 
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildVoiceStates,
         GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMembers // Add this to handle member-related events like mentions.
     ]
 });
 
@@ -35,7 +37,7 @@ client.player.extractors.register(SpotifyExtractor, {
 });
 
 client.player.events.on('audioTracksAdd', (queue) => {
-    queue.metadata.channel.send(`Multiple Track's queued`);
+    queue.metadata.channel.send(`Multiple tracks queued`);
 });
 
 client.player.events.on('playerSkip', (queue, track) => {
@@ -43,7 +45,7 @@ client.player.events.on('playerSkip', (queue, track) => {
 });
 
 client.player.events.on('emptyChannel', (queue) => {
-    queue.metadata.channel.send(`Leaving because no vc activity for the past 5 minutes`);
+    queue.metadata.channel.send(`Leaving due to no VC activity for 5 minutes`);
 });
 
 client.player.events.on('emptyQueue', (queue) => {
@@ -63,6 +65,12 @@ client.player.events.on('playerError', (error) => {
 client.player.events.on('playerFinish', async (queue, track) => {
     const playerFinishHandler = require('./events/playerFinish');
     await playerFinishHandler.execute(queue, track, client);
+});
+
+// AFK Mention Handler - This will check all mentions across all servers
+client.on(Events.MessageCreate, async (message) => {
+    if (message.author.bot) return;  // Ignore bot messages
+    afkCommand.handleMentions(message); // Call the AFK mention handler
 });
 
 // Connect to MongoDB
@@ -108,8 +116,7 @@ for (const file of eventFiles) {
     }
 }
 
-commandHandler(client);
-
+// Prefix mention for help and prefix information
 client.on('messageCreate', async (message) => {
     if (message.type !== 0 || message.author.bot) return;
     const serverSettings = await ServerSettings.findOne({ guildId: message.guild.id });

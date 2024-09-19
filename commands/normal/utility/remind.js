@@ -1,11 +1,12 @@
 const ms = require('ms');
+const ReminderHandler = require('../../../utils/remainderHandler');
+const reminderHandler = new ReminderHandler();
 
 module.exports = {
     name: 'remind',
     description: 'Sets a reminder.',
-    category: 'utility',
+    aliases: ['reminder', 'setremind'],
     execute(message, args) {
-        console.log('Executing command: remind');
         const time = args[0];
         const reminder = args.slice(1).join(' ');
 
@@ -13,11 +14,12 @@ module.exports = {
             return message.reply('Please provide a time and a reminder message.');
         }
 
-        message.reply(`Reminder set for ${time}.`);
+        const timeMs = ms(time);
+        if (!timeMs) {
+            return message.reply('Please provide a valid time format i.e in seconds!!');
+        }
 
-        setTimeout(() => {
-            message.reply(`Reminder: ${reminder}`);
-            console.log(`Reminder: ${reminder}`);
-        }, ms(time));
+        reminderHandler.setReminder(message.author.id, timeMs, message);
+        message.reply(`⏰ Reminder set for ${time}.`);
     },
 };

@@ -35,7 +35,7 @@ module.exports = {
 
     const ship = await new canvafy.Ship()
       .setAvatars(user1.displayAvatarURL({ forceStatic: true, extension: 'png' }), user2.displayAvatarURL({ forceStatic: true, extension: 'png' }))
-      .setBackground('image', 'https://static.zerochan.net/Hotch.Kiss.full.1004294.jpg')
+      .setBackground('image', 'https://wallpaperaccess.com/full/6304464.jpg')
       .setBorder('#C658E5')
       .setCustomNumber(shipPercentage)
       .setOverlayOpacity(0.5)

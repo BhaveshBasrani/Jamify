@@ -26,6 +26,7 @@
     "mongoose": "^8.5.4",
     "musicard": "^2.0.5",
     "node-fetch": "^2.7.0",
+    "node-schedule": "^2.1.1",
     "npm": "^10.8.2",
     "npmlog": "^7.0.1",
     "opusscript": "^0.0.8",
