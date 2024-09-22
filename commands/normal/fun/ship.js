@@ -44,8 +44,8 @@ module.exports = {
       const buffer = Buffer.from(ship);
 
     const embed = new EmbedBuilder()
-      .setTitle('MATCHMAKING 💕')
-      .setDescription(`<@${user1.id}> ❤️ <@${user2.id}>`)
+      .setTitle('MATCHMAKING <a:Ship_Cmd:1286008211765198928>')
+      .setDescription(`<@${user1.id}> <a:Ship_Cmd:1286008211765198928> <@${user2.id}>`)
       .addFields(
         { name: 'Ship Name', value: shipName, inline: true },
         { name: 'Match Percentage', value: `${shipPercentage}%`, inline: true },
