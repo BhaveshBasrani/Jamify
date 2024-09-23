@@ -1,21 +1,19 @@
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const GuildConfig = require('../../../models/guildConfig.js'); // Adjust the path as needed
-const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } = require('discord.js');
+const { logo, footer } = require('../../../config.json');
 
 module.exports = {
     name: 'report',
     description: 'Reports a user.',
     category: 'Moderation',
     aliases: ['rep', 'complain'],
-    async execute(message, args) {
+    async execute(message) {
         console.log('Executing command: report');
         const user = message.mentions.users.first();
         if (!user) {
             return message.reply('Please mention a user to report.');
         }
-        const reason = args.slice(1).join(' ') || 'No reason provided';
 
-        // Get the log channel ID from the database (assuming you've stored it)
         const guildId = message.guild.id;
         const guildConfig = await GuildConfig.findOne({ guildId });
         const logChannelId = guildConfig?.logChannelId;
@@ -23,91 +21,92 @@ module.exports = {
         if (!logChannelId) {
             return message.reply('Log channel not set. Please configure a log channel for audit logs.');
         }
-        
-        const footer = 'Your footer text here'; // Define footer text
-        const logo = 'Your logo URL here'; // Define logo URL
 
-        const reportEmbed = new EmbedBuilder()
+        const confirmEmbed = new EmbedBuilder()
             .setColor('#FFD700')
-            .setTitle('User Reported')
-            .setDescription(`<@${user.id}> has been reported by <@${message.author.id}> for: ${reason}`)
-            .setTimestamp()
-            .setFooter({ text: footer, iconUrl: logo });
+            .setTitle('Confirm Report')
+            .setDescription(`Are you sure you want to report <@${user.id}>?`);
 
-        // Send the report message to the log channel
-        const logChannel = message.guild.channels.cache.get(logChannelId);
-        if (logChannel) {
-            await logChannel.send({ embeds: [reportEmbed] });
-        } else {
-            console.error(`Log channel with ID ${logChannelId} not found.`);
-        }
+        const confirmButton = new ButtonBuilder()
+            .setCustomId('confirmReport')
+            .setLabel('Confirm')
+            .setStyle(ButtonStyle.Danger);
 
-        // Send DM to the server owner
-        const owner = await message.guild.fetchOwner();
-        if (owner) {
-            await owner.send({ embeds: [reportEmbed] }).catch(error => {
-                console.error('Failed to send DM to the server owner:', error);
-            });
-        } else {
-            console.error('Server owner not found.');
-        }
+        const cancelButton = new ButtonBuilder()
+            .setCustomId('cancelReport')
+            .setLabel('Cancel')
+            .setStyle(ButtonStyle.Secondary);
 
-        // Send DM to the reported user
-        await user.send({ embeds: [reportEmbed] }).catch(error => {
-            console.error('Failed to send DM to the reported user:', error);
-        });
+        const actionRow = new ActionRowBuilder().addComponents(confirmButton, cancelButton);
 
-        // Create a modal for the reason
-        const modal = new ModalBuilder()
-            .setCustomId('reportReasonModal')
-            .setTitle('Report Reason');
+        const confirmMessage = await message.reply({ embeds: [confirmEmbed], components: [actionRow] });
 
-        const reasonInput = new TextInputBuilder()
-            .setCustomId('reportReasonInput')
-            .setLabel('Reason for reporting')
-            .setStyle(TextInputStyle.Paragraph)
-            .setRequired(true);
+        const filter = i => i.user.id === message.author.id;
+        const collector = confirmMessage.createMessageComponentCollector({ filter, time: 60000 });
 
-        const actionRow = new ActionRowBuilder().addComponents(reasonInput);
-        modal.addComponents(actionRow);
+        collector.on('collect', async interaction => {
+            if (interaction.customId === 'confirmReport') {
+                // No need to update the interaction after showing the modal
+                // Create a modal for the reason
+                const modal = new ModalBuilder()
+                    .setCustomId('reportReasonModal')
+                    .setTitle('Report Reason');
 
-        // Show the modal to the user
-        await message.showModal(modal).catch(console.error);
+                const reasonInput = new TextInputBuilder()
+                    .setCustomId('reportReasonInput')
+                    .setLabel('Reason for reporting')
+                    .setStyle(TextInputStyle.Paragraph)
+                    .setRequired(false);
 
-        // Handle the modal submission
-        message.client.on('interactionCreate', async interaction => {
-            if (!interaction.isModalSubmit()) return;
-            if (interaction.customId === 'reportReasonModal') {
-                const reason = interaction.fields.getTextInputValue('reportReasonInput');
-                reportEmbed.setDescription(`<@${user.id}> has been reported by <@${message.author.id}> for: ${reason}`);
-                
-                // Send the updated report message to the log channel
-                if (logChannel) {
-                    await logChannel.send({ embeds: [reportEmbed] });
-                } else {
-                    console.error(`Log channel with ID ${logChannelId} not found.`);
+                const modalActionRow = new ActionRowBuilder().addComponents(reasonInput);
+                modal.addComponents(modalActionRow);
+
+                await interaction.showModal(modal).catch(console.error);
+
+                // Handle the modal submission
+                const modalInteraction = await interaction.awaitModalSubmit({ time: 60000 }).catch(console.error);
+                if (modalInteraction) {
+                    const reason = modalInteraction.fields.getTextInputValue('reportReasonInput') || 'No reason provided';
+
+                    const reportEmbed = new EmbedBuilder()
+                        .setColor('#FFD700')
+                        .setTitle('User Reported')
+                        .setDescription(`<@${user.id}> has been reported by <@${message.author.id}> for: ${reason}`)
+                        .setTimestamp()
+                        .setFooter({ text: footer, iconUrl: logo });
+
+                    const logChannel = message.guild.channels.cache.get(logChannelId);
+                    if (logChannel) {
+                        await logChannel.send({ embeds: [reportEmbed] });
+                    } else {
+                        console.error(`Log channel with ID ${logChannelId} not found.`);
+                    }
+
+                    const owner = await message.guild.fetchOwner();
+                    if (owner) {
+                        await owner.send({ embeds: [reportEmbed] }).catch(error => {
+                            console.error('Failed to send DM to the server owner:', error);
+                        });
+                    }
+
+                    // Reply only once after modal submission
+                    await modalInteraction.reply({ embeds: [reportEmbed], ephemeral: true });
+
+                    // Delete the report message and the user's command message
+                    await confirmMessage.delete().catch(console.error);
+                    await message.delete().catch(console.error);
+
+                    confirmMessage.edit({ components: [new ActionRowBuilder().addComponents(confirmButton.setDisabled(true), cancelButton.setDisabled(true))] });
                 }
-
-                // Send the updated report message to the server owner
-                if (owner) {
-                    await owner.send({ embeds: [reportEmbed] }).catch(error => {
-                        console.error('Failed to send DM to the server owner:', error);
-                    });
-                } else {
-                    console.error('Server owner not found.');
-                }
-
-                // Send the updated report message to the reported user
-                await user.send({ embeds: [reportEmbed] }).catch(error => {
-                    console.error('Failed to send DM to the reported user:', error);
-                });
-
-                // Send the updated report message to the command issuer
-                await interaction.reply({ embeds: [reportEmbed], ephemeral: true });
+            } else if (interaction.customId === 'cancelReport') {
+                await interaction.update({ content: 'Report cancelled.', components: [] });
             }
         });
 
-        // Send initial report message to the command issuer
-        await message.reply({ embeds: [reportEmbed] });
-    },
+        collector.on('end', collected => {
+            if (collected.size === 0) {
+                confirmMessage.edit({ content: 'Report timed out.', components: [] });
+            }
+        });
+    }
 };
