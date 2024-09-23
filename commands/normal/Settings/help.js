@@ -13,35 +13,41 @@ module.exports = {
     const categories = [...new Set(uniqueCommands.map(cmd => commands.find(c => c.name === cmd).category).filter(category => category))];
 
     const categoryEmojis = {
-      fun: '<:Fun_Help:1287708149234663435>',
-      music: '<:Music_Help:1287708455901204491>',
-      general: '📋',
-      utility: '🛠️'
+      fun: '<a:Fun_Cmds:1280033969185755247>',
+      music: '<a:Music_Cmds:1280034171431026749>',
+      settings: '<a:Settings:1280034262183051265>',
+      utility: '<:Utilities:1287733735340642305>',
+      moderation: '<a:Moderation_Cmds:1287732044071178320>'
     };
 
     const selectMenu = new StringSelectMenuBuilder()
       .setCustomId('help-menu')
       .setPlaceholder('Jamify Here | Select To Browse')
       .addOptions(
-      new StringSelectMenuOptionBuilder()
-        .setLabel('Home')
-        .setValue('home')
-        .setDescription('Return to the home page')
-        .setEmoji('<:Home_Page:1280034086638846003>'),
-      ...categories.map(category => 
         new StringSelectMenuOptionBuilder()
-        .setLabel(category.charAt(0).toUpperCase() + category.slice(1))
-        .setValue(category)
-        .setDescription(`View ${category} commands`)
-        .setEmoji(categoryEmojis[category.toLowerCase()])
-      )
+          .setLabel('Home')
+          .setValue('home')
+          .setDescription('Return to the home page')
+          .setEmoji('<:Home_Page:1280034086638846003>'),
+        ...categories.map(category =>
+          new StringSelectMenuOptionBuilder()
+            .setLabel(category.charAt(0).toUpperCase() + category.slice(1))
+            .setValue(category)
+            .setDescription(`View ${category} commands`)
+            .setEmoji(categoryEmojis[category.toLowerCase()])
+        )
       );
-    const embed = new EmbedBuilder()
+
+    const homembed = new EmbedBuilder()
       .setTitle('<:Home_Page:1280034086638846003>  Home')
       .setDescription(`**Hey ${message.author} Itz Me Jamify**\n`)
+      .setAuthor({
+        name: 'Jamify',
+        iconURL: logo
+    })
       .addFields(
-      { name: '<:Categories:1287702178974273557>  **__Categories__**', value: '> Fun\n > Music\n > General\n > Utility' },
-      { name: '<:Links:1287701497072717836>  **__Links__**', value: `[Dashboard](${website})` }
+        { name: '<:Categories:1287702178974273557>  **__Categories__**', value: '**> <:Fun_Help:1287708149234663435>Fun\n > <:Music_Help:1287708455901204491>Music\n > <:Mod_Help:1287731671235563625>Moderation \n> <:Settings_Help:1287734580996214850>Settings\n > <:Utils_Help:1287733750733475910>Utility**' },
+        { name: '<:Links:1287701497072717836>  **__Links__**', value: `[Dashboard](${website})` }
       )
       .setColor(0x1E90FF)
       .setImage(banner)
@@ -52,7 +58,7 @@ module.exports = {
 
     let msg;
     try {
-      msg = await message.channel.send({ embeds: [embed], components: [row] });
+      msg = await message.channel.send({ embeds: [homembed], components: [row] });
     } catch (error) {
       console.error('Error sending help menu:', error);
       return;
@@ -65,7 +71,12 @@ module.exports = {
 
     collector.on('collect', async interaction => {
       if (interaction.customId !== 'help-menu') return;
-      
+
+      if (interaction.values[0] === 'home') {
+        await interaction.update({ embeds: [homembed] });
+        return;
+      }
+
       const category = interaction.values[0];
       let categoryCommands = uniqueCommands
         .filter(cmd => {
@@ -74,7 +85,7 @@ module.exports = {
         })
         .map(cmd => `**${cmd}**: ${commands.find(c => c.name === cmd).description}`)
         .join('\n');
-      
+
       if (categoryCommands.length > 2048) {
         categoryCommands = categoryCommands.substring(0, 2045) + '...';
       }
@@ -91,7 +102,7 @@ module.exports = {
           name: 'Jamify',
           iconURL: logo,
           url: website
-      })
+        })
         .setDescription(categoryCommands ? categoryCommands.split('\n').map(cmd => `<a:Blue_Arrow:1280033714100768779> ${cmd}`).join('\n') : 'No commands available')
         .setColor(0x32CD32)
         .setImage(banner)
@@ -107,7 +118,9 @@ module.exports = {
     });
 
     collector.on('end', async () => {
-      await msg.edit({ components: [] });
+      const disabledSelectMenu = StringSelectMenuBuilder.from(selectMenu).setDisabled(true);
+      const disabledRow = new ActionRowBuilder().addComponents(disabledSelectMenu);
+      await msg.edit({ components: [disabledRow] });
     });
-  },
+  }
 };
