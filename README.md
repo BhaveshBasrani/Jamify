@@ -3,7 +3,7 @@
 
 Jamify is a Discord bot designed to enhance your server's music experience. With Jamify, you can easily play, pause, skip, and manage your music queue with simple commands.
 
-![Banner](https://s1.gifyu.com/images/SAq2p.gif)
+<img src="https://s1.gifyu.com/images/SAq2p.gif" alt="Banner" style="width:100%;"/>
 
 ## Features
 
@@ -72,3 +72,6 @@ This project is licensed under the MIT License.
 For any questions or suggestions, feel free to open an issue or contact the maintainer.
 
 Visit our website: [Jamify](https://yourjamify.tech)
+
+<img src="https://i.ibb.co/107ptbV/standard-1.gif" alt="Logo" style="width:100%;"/>
+
