@@ -58,8 +58,7 @@ module.exports = {
             }
 
             const first = results[0];
-
-            if (!first.syncedLyrics) {
+            if (!first || !first.syncedLyrics) {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
                     .setDescription('No synced lyrics available for this song!')
@@ -88,8 +87,8 @@ module.exports = {
 
             const sentMessage = await message.channel.send({ embeds: [lyricsEmbed] });
 
-            syncedLyrics.onChange(async (lyrics, timestamp) => {
-                lyricsEmbed.setDescription(`[${timestamp}]: ${lyrics}`);
+            syncedLyrics.onChange(async (lyrics) => {
+                lyricsEmbed.setDescription(`[${lyrics}`);
                 await sentMessage.edit({ embeds: [lyricsEmbed] });
             });
             syncedLyrics.subscribe();

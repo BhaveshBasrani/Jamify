@@ -4,7 +4,7 @@ const afkCollection = new Collection();
 module.exports = {
     name: 'afk',
     category: 'fun',
-    description: 'Toggle AFK status with a custom message and notify others when mentioned.',
+    description: 'Toggle AFK status and notify others when mentioned.',
     aliases: ['away', 'brb', 'gone'],
     async execute(message, args) {
         const userId = message.author.id;

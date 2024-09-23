@@ -44,7 +44,7 @@ module.exports = {
             voiceChannelId: message.member.voice.channel.id
         };
 
-        queue.insertTrack(track, queue.tracks.length);
+        queue.addTrack(track);
 
         const embed = new EmbedBuilder()
             .setTitle('Song Added to Queue')
@@ -52,7 +52,7 @@ module.exports = {
             .setColor('Blue')
             .addFields({
                 name: '**Position in Queue**',
-                value: `${queue.tracks.indexOf(track) + 1} of ${queue.tracks.length}`,
+                value: `${queue.tracks.toArray().indexOf(track) + 1} of ${queue.tracks.size()}`,
                 inline: true,
               },
               {
