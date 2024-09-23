@@ -12,21 +12,37 @@ module.exports = {
     const uniqueCommands = [...new Set(commands.map(cmd => cmd.name))];
     const categories = [...new Set(uniqueCommands.map(cmd => commands.find(c => c.name === cmd).category).filter(category => category))];
 
+    const categoryEmojis = {
+      fun: '<:Fun_Help:1287708149234663435>',
+      music: '<:Music_Help:1287708455901204491>',
+      general: '📋',
+      utility: '🛠️'
+    };
+
     const selectMenu = new StringSelectMenuBuilder()
       .setCustomId('help-menu')
-      .setPlaceholder('Select a category')
+      .setPlaceholder('Jamify Here | Select To Browse')
       .addOptions(
-        categories.map(category => 
-          new StringSelectMenuOptionBuilder()
-            .setLabel(category.charAt(0).toUpperCase() + category.slice(1))
-            .setValue(category)
-            .setDescription(`View ${category} commands`)
-        )
+      new StringSelectMenuOptionBuilder()
+        .setLabel('Home')
+        .setValue('home')
+        .setDescription('Return to the home page')
+        .setEmoji('<:Home_Page:1280034086638846003>'),
+      ...categories.map(category => 
+        new StringSelectMenuOptionBuilder()
+        .setLabel(category.charAt(0).toUpperCase() + category.slice(1))
+        .setValue(category)
+        .setDescription(`View ${category} commands`)
+        .setEmoji(categoryEmojis[category.toLowerCase()])
+      )
       );
-
     const embed = new EmbedBuilder()
-      .setTitle('<:Help_Cmd:1280034026656370739> Help Menu')
-      .setDescription(`Select a category to view its commands.`)
+      .setTitle('<:Home_Page:1280034086638846003>  Home')
+      .setDescription(`**Hey ${message.author} Itz Me Jamify**\n`)
+      .addFields(
+      { name: '<:Categories:1287702178974273557>  **__Categories__**', value: '> Fun\n > Music\n > General\n > Utility' },
+      { name: '<:Links:1287701497072717836>  **__Links__**', value: `[Dashboard](${website})` }
+      )
       .setColor(0x1E90FF)
       .setImage(banner)
       .setFooter({ text: footer, iconURL: logo })
