@@ -8,7 +8,7 @@ const path = require('path');
 const ServerSettings = require('./models/ServerSettings.js');
 const { token, mongodb, banner, logo, footer, auth } = require('./config.json');
 const commandHandler = require('./handlers/commandHandler.js');
-const afkCommand = require('./commands/normal/fun/afk.js'); // Path to the AFK command
+const afkCommand = require('./commands/normal/Fun/afk.js'); // Path to the AFK command
 
 const client = new Client({
     intents: [
