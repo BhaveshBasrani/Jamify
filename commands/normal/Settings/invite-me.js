@@ -17,7 +17,7 @@ module.exports = {
             })
             .setImage(banner)
             .setTimestamp()
-            .setFooter(footer);
+            .setFooter({text: footer});
 
         const inviteButton = new ButtonBuilder()
             .setLabel('Invite Me')
