@@ -131,7 +131,4 @@ dist
 
 # Ignore config, package-lock, and package files
 config.json
-package-lock.json
-package.json
-config.json
-config.json
+Jamify.zip
