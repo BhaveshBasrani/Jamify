@@ -7,7 +7,6 @@ module.exports = {
     category: 'Settings',
     aliases: ['si', 'sinfo', 's', 'server', 'serverstats', 'guildinfo'],
     async execute(message) {
-        console.log('Executing command: serverinfo');
         const { guild } = message;
         const fetchedMembers = await guild.members.fetch();
         const botCount = fetchedMembers.filter(member => member.user.bot).size;
@@ -16,23 +15,28 @@ module.exports = {
         const voiceChannels = await guild.channels.fetch().then(channels => channels.filter(channel => channel.type === ChannelType.GuildVoice).size);
 
         const embed = new EmbedBuilder()
-            .setTitle(`${guild.name} Server Information`)
-            .setThumbnail(guild.iconURL())
+            .setTitle(`__<a:Info_Cmds:1286008578515271710> ${guild.name} Server Information__`)
+            .setAuthor({
+                name: 'Jamify',
+                iconURL: logo,
+            })
+            .setThumbnail(guild.iconURL({ dynamic: true, size: 1024 }))
             .addFields(
-            { name: '👥 Members', value: guild.memberCount.toString(), inline: true },
-            { name: '🤖 Bots', value: botCount.toString(), inline: true },
-            { name: '👑 Owner', value: `<@${guild.ownerId}>`, inline: true },
-            { name: '📅 Created On', value: guild.createdAt.toDateString(), inline: true },
-            { name: '🌍 Region', value: guild.preferredLocale, inline: true },
-            { name: '🔒 Verification Level', value: guild.verificationLevel, inline: true },
-            { name: '💬 Text Channels', value: textChannels.toString(), inline: true },
-            { name: '🔊 Voice Channels', value: voiceChannels.toString(), inline: true },
-            { name: '🛡️ Roles', value: roles.size.toString(), inline: true },
-            { name: '🚀 Boost Level', value: guild.premiumTier.toString(), inline: true }
+            { name: '<:People:1288116021743456347>  **__Members__**', value: `> **${guild.memberCount.toLocaleString()}**`, inline: false },
+            { name: '<:Bot:1288115849919729756>  **__Bots__**', value: `> **${botCount.toLocaleString()}**`, inline: false },
+            { name: '<:Owner:1288115443260719155>  **__Owner__**', value: `> **<@${guild.ownerId}>**`, inline: false },
+            { name: '<:People:1288116021743456347>  **__Created On__**', value: `> <t:${Math.floor(guild.createdAt.getTime() / 1000)}:D>`, inline: false },
+            { name: '<:Server:1288116464435593226>  **__Region__**', value: `> ${guild.preferredLocale}`, inline: false },
+            { name: '<:Lock:1288116764500033702>  **__Verification Level__**', value: `> ${guild.verificationLevel}`, inline: false },
+            { name: '<:Text_Channels:1288114783568134164>  **__Text Channels__**', value: `> ${textChannels.toLocaleString()}`, inline: false },
+            { name: '<:Volume:1288117044369424394>  **__Voice Channels__**', value: `> ${voiceChannels.toLocaleString()}`, inline: false },
+            { name: '<:Roles:1288115163408633997>  **__Roles__**', value: `> ${roles.size.toLocaleString()}`, inline: false },
+            { name: '<:Boost:1288117445411868712>  **__Boost Level__**', value: `> ${guild.premiumTier}`, inline: false }
             )
-            .setColor('#00AAFF')
+            .setColor('#5865F2')
             .setImage(banner)
-            .setFooter({ text: footer, iconURL: logo });
+            .setFooter({ text: footer, iconURL: logo })
+            .setTimestamp();
 
         message.channel.send({ embeds: [embed] });
     },

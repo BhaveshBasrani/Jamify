@@ -1,4 +1,4 @@
-const { PermissionsBitField, EmbedBuilder, MessageActionRow, MessageButton } = require('discord.js');
+const { PermissionsBitField, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 module.exports = {
   name: 'clear',
@@ -39,16 +39,16 @@ module.exports = {
       .setColor('Yellow')
       .setDescription(`Are you sure you want to delete ${amount} messages?`);
 
-    const row = new MessageActionRow()
+    const row = new ActionRowBuilder()
       .addComponents(
-        new MessageButton()
+        new ButtonBuilder()
           .setCustomId('confirm')
           .setLabel('Confirm')
-          .setStyle('DANGER'),
-        new MessageButton()
+          .setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
           .setCustomId('cancel')
           .setLabel('Cancel')
-          .setStyle('SECONDARY')
+          .setStyle(ButtonStyle.Secondary)
       );
 
     message.reply({ embeds: [confirmEmbed], components: [row] }).then(sentMessage => {
