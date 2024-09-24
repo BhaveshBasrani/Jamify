@@ -1,6 +1,6 @@
 const { QueryType, useMainPlayer } = require('discord-player');
 const { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
-const { banner, logo, footer } = require('../../../config.json')
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
     name: 'search',
@@ -42,7 +42,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle('Search Results')
             .setDescription(tracks.map((track, index) => `${index + 1}. ${track.title}`).join('\n'))
-            .setColor('Blue')
+            .setColor(color)
             .setImage(banner)
             .setFooter({ text: footer, iconURL: logo});
 
@@ -83,7 +83,7 @@ module.exports = {
             .setTitle('Now Playing')
             .setAuthor({ name: 'Jamify', iconURL: logo })
             .setDescription(`**${track.title}** by **${track.author}**`)
-            .setColor('Blue')
+            .setColor(color)
             .setThumbnail(track.thumbnail)
             .setImage(banner)
             .setFooter({ text: footer })

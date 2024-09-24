@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const canvafy = require('canvafy');
-const { footer, logo } = require('../../../config.json');
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
   name: 'ship',
@@ -52,7 +52,7 @@ module.exports = {
         { name: 'Description', value: description }
       )
       .setImage('attachment://ship.png')
-      .setColor('#C658E5')
+      .setColor(color)
       .setFooter({ text: footer, iconURL: logo });
 
     message.channel.send({ embeds: [embed], files: [{ attachment: buffer, name: 'ship.png' }] });

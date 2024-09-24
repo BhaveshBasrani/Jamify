@@ -11,7 +11,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle('👤 User Info')
             .setThumbnail(member.user.displayAvatarURL())
-            .setColor('Green')
+            .setcolor(color)
             .setImage(banner)
             .setFooter({ text: footer, iconURL: logo });
 

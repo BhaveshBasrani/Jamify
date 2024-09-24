@@ -1,7 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
 const { useQueue } = require("discord-player");
 const { lyricsExtractor } = require('@discord-player/extractor');
-const { logo, banner, footer, geniusApiToken } = require('../../../config.json')
+const { logo, banner, footer, geniusApiToken, color } = require('../../../config.json')
 
 const lyricsFinder = lyricsExtractor(geniusApiToken);
 
@@ -17,7 +17,7 @@ module.exports = {
             const errorEmbed = new EmbedBuilder()
                 .setTitle('Error')
                 .setDescription('No music is being played!')
-                .setColor('Red')
+                .setColor(color)
                 .setFooter({ text: footer, iconURL: logo });
 
             return message.channel.send({ embeds: [errorEmbed] });
@@ -30,7 +30,7 @@ module.exports = {
             const errorEmbed = new EmbedBuilder()
                 .setTitle('Error')
                 .setDescription('No lyrics found for this song!')
-                .setColor('Red')
+                .setColor(color)
                 .setFooter({ text: footer, iconURL: logo });
 
             return message.channel.send({ embeds: [errorEmbed] });
@@ -47,7 +47,7 @@ module.exports = {
             })
             .setDescription(lyrics.lyrics)
             .setImage(banner)
-            .setColor('Random');
+            .setColor(color);
 
         message.channel.send({ embeds: [embed] });
     },

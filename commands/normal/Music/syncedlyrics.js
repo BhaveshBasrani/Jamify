@@ -15,7 +15,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
                     .setDescription('Player or queue is not initialized.')
-                    .setColor('Red')
+                    .setcolor(color)
                     .setFooter({ text: footer, iconURL: logo });
 
                 return message.channel.send({ embeds: [errorEmbed] });
@@ -25,7 +25,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
                     .setDescription('No music is being played!')
-                    .setColor('Red')
+                    .setcolor(color)
                     .setFooter({ text: footer, iconURL: logo });
 
                 return message.channel.send({ embeds: [errorEmbed] });
@@ -37,7 +37,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
                     .setDescription('No track is currently playing.')
-                    .setColor('Red')
+                    .setcolor(color)
                     .setFooter({ text: footer, iconURL: logo });
 
                 return message.channel.send({ embeds: [errorEmbed] });
@@ -51,7 +51,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
                     .setDescription('No lyrics found for this song!')
-                    .setColor('Red')
+                    .setcolor(color)
                     .setFooter({ text: footer, iconURL: logo });
 
                 return message.channel.send({ embeds: [errorEmbed] });
@@ -62,7 +62,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
                     .setDescription('No synced lyrics available for this song!')
-                    .setColor('Red')
+                    .setcolor(color)
                     .setFooter({ text: footer, iconURL: logo });
 
                 return message.channel.send({ embeds: [errorEmbed] });
@@ -74,7 +74,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
                     .setDescription('Failed to initialize synced lyrics.')
-                    .setColor('Red')
+                    .setcolor(color)
                     .setFooter({ text: footer, iconURL: logo });
 
                 return message.channel.send({ embeds: [errorEmbed] });
@@ -82,7 +82,7 @@ module.exports = {
 
             const lyricsEmbed = new EmbedBuilder()
                 .setTitle(`**Live** Lyrics for ${track.title} by ${track.author}`)
-                .setColor('Blue')
+                .setColor(color)
                 .setFooter({ text: footer, iconURL: logo });
 
             const sentMessage = await message.channel.send({ embeds: [lyricsEmbed] });
@@ -104,7 +104,7 @@ module.exports = {
             const errorEmbed = new EmbedBuilder()
                 .setTitle('Error')
                 .setDescription('An error occurred while fetching lyrics.')
-                .setColor('Red')
+                .setcolor(color)
                 .setFooter({ text: footer, iconURL: logo });
 
             return message.channel.send({ embeds: [errorEmbed] });

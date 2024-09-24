@@ -1,6 +1,6 @@
 const { EmbedBuilder, PermissionsBitField } = require('discord.js');
 const ServerSettings = require('../../../models/ServerSettings.js');
-const { banner, logo, footer } = require('../../../config.json');
+const { logo, banner, footer, color } = require('../../../config.json');;
 
 module.exports = {
     name: 'setprefix',
@@ -30,7 +30,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle('Prefix Updated')
             .setDescription(`The prefix has been updated to \`${newPrefix}\`.`)
-            .setColor('Green')
+            .setcolor(color)
             .setImage(banner)
             .setFooter({ text: footer, iconURL: logo });
 

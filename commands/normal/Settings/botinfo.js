@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const { banner, logo, footer } = require('../../../config.json');
+const { logo, banner, footer, color } = require('../../../config.json');;
 
 module.exports = {
     name: 'botinfo',

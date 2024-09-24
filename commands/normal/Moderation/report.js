@@ -1,6 +1,6 @@
 const { EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const GuildConfig = require('../../../models/guildConfig.js'); // Adjust the path as needed
-const { logo, footer } = require('../../../config.json');
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
     name: 'report',
@@ -23,8 +23,9 @@ module.exports = {
         }
 
         const confirmEmbed = new EmbedBuilder()
-            .setColor('#FFD700')
+            .setColor(color)
             .setTitle('Confirm Report')
+            .setImage(banner)
             .setDescription(`Are you sure you want to report <@${user.id}>?`);
 
         const confirmButton = new ButtonBuilder()
@@ -69,8 +70,13 @@ module.exports = {
                     const reason = modalInteraction.fields.getTextInputValue('reportReasonInput') || 'No reason provided';
 
                     const reportEmbed = new EmbedBuilder()
-                        .setColor('#FFD700')
+                        .setColor(color)
                         .setTitle('User Reported')
+                        .setImage(banner)
+                        .setAuthor({
+                            name: 'Jamify',
+                            iconURL: logo,
+                        })
                         .setDescription(`<@${user.id}> has been reported by <@${message.author.id}> for: ${reason}`)
                         .setTimestamp()
                         .setFooter({ text: footer, iconUrl: logo });

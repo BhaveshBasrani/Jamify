@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const { useQueue } = require('discord-player');
-const { banner, logo, footer } = require('../../../config.json');
+const { logo, banner, footer, color } = require('../../../config.json');;
 
 module.exports = {
   name: 'skip',

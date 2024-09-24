@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const fetch = require('node-fetch');
-const { logo, website } = require('../../../config.json');
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
     name: 'meme',
@@ -27,9 +27,9 @@ module.exports = {
                 .setAuthor({
                     name: 'Jamify',
                     iconURL: logo,
-                    url: website
                 })
                 .setURL(data.postLink)
+                .setColor(color)
                 .setTitle(data.title)
                 .setImage(data.url)
                 .addFields(

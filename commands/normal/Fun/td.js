@@ -1,6 +1,6 @@
 const { EmbedBuilder, StringSelectMenuBuilder, ActionRowBuilder } = require('discord.js');
 const fetch = require('node-fetch');
-const { footer, logo } = require('../../../config.json');
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
     name: 'td',
@@ -12,7 +12,7 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setTitle('Truth or Dare')
                 .setDescription('Choose truth or dare from the menu below.')
-                .setColor('Purple')
+                .setColor(color)
                 .setFooter({ text: footer, iconURL: logo });
 
             const row = new ActionRowBuilder()
@@ -47,7 +47,7 @@ module.exports = {
                         const truthEmbed = new EmbedBuilder()
                             .setTitle('Truth')
                             .setDescription(data.question)
-                            .setColor('Blue')
+                            .setColor(color)
                             .setFooter({ text: footer, iconURL: logo });
 
                         await i.update({ embeds: [truthEmbed], components: [] });
@@ -62,7 +62,7 @@ module.exports = {
                                 const answerEmbed = new EmbedBuilder()
                                     .setTitle('Truth Answer')
                                     .setDescription(m.content)
-                                    .setColor('Blue')
+                                    .setColor(color)
                                     .setFooter({ text: footer, iconURL: logo });
 
                                 await message.channel.send({ embeds: [answerEmbed] });
@@ -77,7 +77,7 @@ module.exports = {
                         const dareEmbed = new EmbedBuilder()
                             .setTitle('Dare')
                             .setDescription(data.question)
-                            .setColor('Red')
+                            .setColor(color)
                             .setFooter({ text: footer, iconURL: logo });
 
                         await i.update({ embeds: [dareEmbed], components: [] });
@@ -92,7 +92,7 @@ module.exports = {
                                 const answerEmbed = new EmbedBuilder()
                                     .setTitle('Dare Answer')
                                     .setDescription(m.content)
-                                    .setColor('Red')
+                                    .setColor(color)
                                     .setFooter({ text: footer, iconURL: logo });
 
                                 await message.channel.send({ embeds: [answerEmbed] });

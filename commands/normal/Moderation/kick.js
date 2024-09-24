@@ -1,6 +1,6 @@
 const { PermissionsBitField, EmbedBuilder } = require('discord.js');
 const GuildConfig = require('../../../models/guildConfig.js'); 
-const { giphyk, logo, footer } = require('../../../config.json');
+const { logo, banner, footer, color } = require('../../../config.json');
 const fetch = require('node-fetch');
 
 module.exports = {
@@ -13,7 +13,7 @@ module.exports = {
 
     if (!message.member.permissions.has(PermissionsBitField.Flags.KickMembers)) {
       const noPermEmbed = new EmbedBuilder()
-        .setColor('#FF0000')
+        .setColor(color)
         .setDescription('You do not have permissions to kick members.')
         .setFooter({ text: footer, iconUrl: logo })
         .setTimestamp();
@@ -23,7 +23,7 @@ module.exports = {
     const user = message.mentions.users.first();
     if (!user) {
       const noUserEmbed = new EmbedBuilder()
-        .setColor('#FF0000')
+        .setColor(color)
         .setDescription('Please mention a user to kick.')
         .setFooter({ text: footer, iconUrl: logo })
         .setTimestamp();
@@ -33,7 +33,7 @@ module.exports = {
     const member = message.guild.members.resolve(user);
     if (!member) {
       const noMemberEmbed = new EmbedBuilder()
-        .setColor('#FF0000')
+        .setColor(color)
         .setDescription('User not found.')
         .setFooter({ text: footer, iconUrl: logo })
         .setTimestamp();
@@ -42,7 +42,7 @@ module.exports = {
 
     if (!message.guild.members.me.permissions.has(PermissionsBitField.Flags.KickMembers)) {
       const noBotPermEmbed = new EmbedBuilder()
-        .setColor('#FF0000')
+        .setColor(color)
         .setDescription('I do not have permissions to kick members.')
         .setFooter({ text: footer, iconUrl: logo })
         .setTimestamp();
@@ -52,7 +52,7 @@ module.exports = {
     const reason = args.slice(1).join(' ') || 'No reason provided';
 
     const kickEmbed = new EmbedBuilder()
-      .setColor('#FF0000')
+      .setColor(color)
       .setTitle('User Kicked')
       .setDescription(`${member} has been kicked by <@${message.author.id}> for: ${reason}`)
       .setFooter({ text: footer, iconUrl: logo })
@@ -66,7 +66,7 @@ module.exports = {
     } catch (error) {
       console.error('Error fetching guild config:', error);
       const errorEmbed = new EmbedBuilder()
-        .setColor('#FF0000')
+        .setColor(color)
         .setDescription('Error fetching guild config. Please try again later.')
         .setFooter({ text: footer, iconUrl: logo })
         .setTimestamp();
@@ -76,7 +76,7 @@ module.exports = {
 
     if (!logChannelId) {
       const noLogChannelEmbed = new EmbedBuilder()
-        .setColor('#FF0000')
+        .setColor(color)
         .setDescription('Log channel not set. Please configure a log channel for audit logs.')
         .setFooter({ text: footer, iconUrl: logo })
         .setTimestamp();

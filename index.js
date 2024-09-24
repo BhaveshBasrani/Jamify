@@ -126,7 +126,7 @@ client.on('messageCreate', async (message) => {
         const embed = new EmbedBuilder()
             .setTitle('Heyy!!! Am Jamify')
             .setDescription(`My prefix in this server is \`${prefix}\`. Use ${prefix}help for more info.`)
-            .setColor('Blue')
+            .setColor(color)
             .setImage(banner)
             .setFooter({ text: footer, iconURL: logo });
 

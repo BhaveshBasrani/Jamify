@@ -1,7 +1,7 @@
 const { PermissionsBitField, EmbedBuilder } = require('discord.js');
 const GuildConfig = require('../../../models/guildConfig.js'); // Adjust the path as needed
 const fetch = require('node-fetch');
-const { giphyk, logo, footer } = require('../../../config.json');
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
   name: 'revoke',
@@ -38,27 +38,10 @@ module.exports = {
       return message.reply('Log channel not set. Please configure a log channel for audit logs. \nUse command `..setlogchannel`');
     }
 
-    const url = `https://api.giphy.com/v1/gifs/search?q=Party&api_key=${giphyk}&limit=5`;
-    let data;
-    try {
-      const res = await fetch(url);
-      data = await res.json();
-    } catch (error) {
-      console.error('Failed to retrieve GIF from Giphy API');
-      return message.reply('Failed to retrieve GIF from Giphy API');
-    }
-
-    if (!data || !data.data || !data.data[0]) {
-      console.error('Failed to retrieve GIF from Giphy API');
-      return message.reply('Failed to retrieve GIF from Giphy API');
-    }
-
-    const gifUrl = data.data[0].images.original.url;
-
     const unbanEmbed = new EmbedBuilder()
-      .setColor('#00FF00')
+      .setColor(color)
       .setTitle('User Ban Revoked')
-      .setImage(gifUrl)
+      .setImage(banner)
       .setFooter({ text: footer, iconUrl: logo })
       .setDescription(`<@${userId}> has had their ban revoked for: ${reason}\nBy: <@${sender}>`)
       .setTimestamp();

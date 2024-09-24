@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 const { EmbedBuilder} = require('discord.js');
-const { banner, logo, footer } = require('../../../config.json');
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
   name: 'joke',
@@ -16,7 +16,7 @@ module.exports = {
 
       // Create an embed
       const jokeEmbed = new EmbedBuilder()
-        .setColor('#0099ff')
+        .setColor(color)
         .setAuthor({ name: 'Jamify', iconURL: logo })
         .setTitle('🤣 Joke 🤣')
         .setImage(banner)
@@ -33,7 +33,7 @@ module.exports = {
     } catch (error) {
       console.error('Error fetching joke:', error);
       const errorEmbed = new EmbedBuilder()
-        .setColor('#ff0000')
+        .setColor(color)
         .setTitle('🚨 Error 🚨')
         .setDescription('Failed to fetch a joke. Please try again later.')
         .setFooter({ text: 'Error fetching joke' });

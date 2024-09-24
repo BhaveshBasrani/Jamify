@@ -2,8 +2,8 @@ module.exports = {
     name: 'say',
     description: 'Makes the bot say a specified message.',
     category: 'Fun',
+    aliases: ['speak', 'repeat'],
     async execute(message, args) {
-        console.log('Executing command: say');
 
         // Join the arguments to form the message text
         const text = args.join(' ');

@@ -1,5 +1,5 @@
 const { EmbedBuilder, ChannelType } = require('discord.js');
-const { logo, banner, footer } = require('../../../config.json');
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
     name: 'serverinfo',
@@ -26,14 +26,14 @@ module.exports = {
             { name: '<:Bot:1288115849919729756>  **__Bots__**', value: `> **${botCount.toLocaleString()}**`, inline: false },
             { name: '<:Owner:1288115443260719155>  **__Owner__**', value: `> **<@${guild.ownerId}>**`, inline: false },
             { name: '<:People:1288116021743456347>  **__Created On__**', value: `> <t:${Math.floor(guild.createdAt.getTime() / 1000)}:D>`, inline: false },
-            { name: '<:Server:1288116464435593226>  **__Region__**', value: `> ${guild.preferredLocale}`, inline: false },
-            { name: '<:Lock:1288116764500033702>  **__Verification Level__**', value: `> ${guild.verificationLevel}`, inline: false },
-            { name: '<:Text_Channels:1288114783568134164>  **__Text Channels__**', value: `> ${textChannels.toLocaleString()}`, inline: false },
-            { name: '<:Volume:1288117044369424394>  **__Voice Channels__**', value: `> ${voiceChannels.toLocaleString()}`, inline: false },
-            { name: '<:Roles:1288115163408633997>  **__Roles__**', value: `> ${roles.size.toLocaleString()}`, inline: false },
-            { name: '<:Boost:1288117445411868712>  **__Boost Level__**', value: `> ${guild.premiumTier}`, inline: false }
+            { name: '<:Server:1288116464435593226>  **__Region__**', value: `> **${guild.preferredLocale}**`, inline: false },
+            { name: '<:Lock:1288116764500033702>  **__Verification Level__**', value: `**> ${guild.verificationLevel}**`, inline: false },
+            { name: '<:Text_Channels:1288114783568134164>  **__Text Channels__**', value: `**> ${textChannels.toLocaleString()}**`, inline: false },
+            { name: '<:Volume:1288117044369424394>  **__Voice Channels__**', value: `**> ${voiceChannels.toLocaleString()}**`, inline: false },
+            { name: '<:Roles:1288115163408633997>  **__Roles__**', value: `**> ${roles.size.toLocaleString()}**`, inline: false },
+            { name: '<:Boost:1288117445411868712>  **__Boost Level__**', value: `**> ${guild.premiumTier}**`, inline: false }
             )
-            .setColor('#5865F2')
+            .setColor(color)
             .setImage(banner)
             .setFooter({ text: footer, iconURL: logo })
             .setTimestamp();

@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const { banner, logo, footer } = require('../../../config.json')
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
     name: 'coinflip',
@@ -12,7 +12,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle('Coin Flip')
             .setDescription(`The coin landed on ${result}!`)
-            .setColor('Orange')
+            .setColor(color)
             .setImage(banner)
             .setFooter({ text: footer, iconUrl: logo });
 

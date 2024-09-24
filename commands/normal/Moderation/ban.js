@@ -1,6 +1,6 @@
 const { PermissionsBitField, EmbedBuilder } = require('discord.js');
 const GuildConfig = require('../../../models/guildConfig.js'); // Adjust the path as needed
-const { logo, footer } = require('../../../config.json');
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
   name: 'ban',
@@ -72,7 +72,7 @@ module.exports = {
 
     // Create the ban embed
     const banEmbed = new EmbedBuilder()
-      .setColor('#FF0000')
+      .setColor(color)
       .setTitle('User Banned')
       .setDescription(`**<@${userId}>** has been banned for: ${reason}\nBy: **<@${message.author.id}>**`)
       .setTimestamp()

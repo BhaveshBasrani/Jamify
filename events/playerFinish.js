@@ -11,7 +11,7 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setTitle('Thank You!')
                 .setDescription('Thank you for using Jamify! 🎶')
-                .setColor('Blue')
+                .setColor(color)
                 .setImage(banner)
                 .setFooter({ text: footer, iconURL: logo });
 

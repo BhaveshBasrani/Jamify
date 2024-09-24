@@ -19,7 +19,7 @@ module.exports = {
             .setImage(banner)
             .setAuthor({name: 'Jamify', iconURL:logo})
             .setDescription('The music has been stopped and the queue has been cleared.')
-            .setColor('Red')
+            .setcolor(color)
             .setFooter({ text: footer , iconURL: logo});
 
         message.channel.send({ embeds: [embed] });

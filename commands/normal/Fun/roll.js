@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const { banner, logo, footer } = require('../../../config.json')
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
     name: 'roll',
@@ -13,7 +13,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle('Dice Roll')
             .setDescription(`You rolled a ${result}!`)
-            .setColor('Purple')
+            .setColor(color)
             .setImage(banner)
             .setFooter({ text: footer, iconUrl: logo });
 

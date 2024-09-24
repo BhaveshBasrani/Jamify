@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const { useQueue } = require('discord-player');
-const { banner, logo, footer } = require('../../../config.json')
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
     name: 'resume',
@@ -22,7 +22,7 @@ module.exports = {
            .setTitle('Song Resumed')
            .setImage(banner)
            .setDescription('The current song has been resumed.')
-           .setColor('Green')
+           .setcolor(color)
            .setFooter({ text: footer, logo});
 
         message.channel.send({ embeds: [embed] });

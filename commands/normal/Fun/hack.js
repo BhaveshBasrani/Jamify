@@ -1,5 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const ms = require('ms');
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
     name: 'hack',
@@ -12,7 +13,8 @@ module.exports = {
 
         const hackEmbed = new EmbedBuilder()
             .setTitle(`🛡️ Initiating hack on ${user.username}...`)
-            .setColor('#FF0000')
+            .setColor(color)
+            .setImage(banner)
             .setFooter({ text: 'Warning: This is highly classified!', iconURL: message.author.displayAvatarURL() });
 
         const msg = await message.channel.send({ embeds: [hackEmbed] });
@@ -71,7 +73,8 @@ module.exports = {
             const finalEmbed = new EmbedBuilder()
                 .setTitle('💀 **HACK COMPLETE**')
                 .setDescription(`All data from ${user.username} has been stolen. The operation is complete.`)
-                .setColor('#000000');
+                .setColor(color)
+                .setImage(banner)
 
             msg.edit({ embeds: [finalEmbed] });
         }, ms('22s'));
@@ -80,7 +83,8 @@ module.exports = {
             const jokeEmbed = new EmbedBuilder()
                 .setTitle('😂 Just Kidding!')
                 .setDescription(`Relax, ${user.username}. No real hacking happened! It was all a joke!`)
-                .setColor('#00FF00')
+                .setColor(color)
+                .setImage(banner)
                 .setFooter({ text: 'Don\'t worry! Your data is safe.', iconURL: message.author.displayAvatarURL() });
 
             msg.edit({ embeds: [jokeEmbed] });

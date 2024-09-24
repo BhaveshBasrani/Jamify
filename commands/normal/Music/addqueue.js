@@ -1,6 +1,6 @@
 const { QueryType, useMainPlayer, useQueue } = require('discord-player');
 const { EmbedBuilder } = require('discord.js');
-const { logo, banner, footer } = require('../../../config.json');
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
     name: 'addqueue',
@@ -51,7 +51,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle('Song Added to Queue')
             .setDescription(`${track.title} has been added to the queue.`)
-            .setColor('Blue')
+            .setColor(color)
             .addFields(
                 {
                     name: '**Position in Queue**',

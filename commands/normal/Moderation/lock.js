@@ -1,5 +1,6 @@
 const { PermissionsBitField } = require("discord.js");
 const { EmbedBuilder } = require("discord.js");
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
     name: 'lock',
@@ -19,7 +20,8 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setTitle('Channel Locked')
                 .setDescription(`This channel has been locked until someone unlocks it.\n\n**Locked by:** ${message.author.tag}`)
-                .setColor(0xff0000)
+                .setColor(color)
+                .setImage(banner)
                 .setTimestamp();
 
             message.channel.send({ embeds: [embed] });

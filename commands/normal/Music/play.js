@@ -1,6 +1,6 @@
 const { QueryType, useQueue, useMainPlayer } = require('discord-player');
 const { EmbedBuilder } = require('discord.js');
-const { logo, footer } = require('../../../config.json');
+const { logo, banner, footer, color } = require('../../../config.json');
 const { ClassicPro, Dynamic } = require('musicard');
 
 module.exports = {
@@ -15,7 +15,7 @@ module.exports = {
       const embed = new EmbedBuilder()
         .setTitle('❌ Error')
         .setDescription('Please provide a song or playlist to play. 🎵')
-        .setColor('Red')
+        .setColor(color)
         .setAuthor({ name: 'Jamify', iconURL: logo })
         .setFooter({ text: footer });
       return message.reply({ embeds: [embed] });
@@ -26,7 +26,7 @@ module.exports = {
       const embed = new EmbedBuilder()
         .setTitle('❌ Error')
         .setDescription('You need to be in a voice channel to play music! 🔊')
-        .setColor('Red')
+        .setcolor(color)
         .setAuthor({ name: 'Jamify', iconURL: logo })
         .setFooter({ text: footer });
       return message.reply({ embeds: [embed] });
@@ -36,7 +36,7 @@ module.exports = {
       const embed = new EmbedBuilder()
         .setTitle('❌ Error')
         .setDescription('Player is not initialized or ready.')
-        .setColor('Red')
+        .setcolor(color)
         .setAuthor({ name: 'Jamify', iconURL: logo })
         .setFooter({ text: footer });
       return message.reply({ embeds: [embed] });
@@ -52,7 +52,7 @@ module.exports = {
         const embed = new EmbedBuilder()
           .setTitle('❌ Error')
           .setDescription(`No results found for ${query}!`)
-          .setColor('Red')
+          .setcolor(color)
           .setAuthor({ name: 'Jamify', iconURL: logo })
           .setFooter({ text: footer });
         return message.reply({ embeds: [embed] });
@@ -101,7 +101,7 @@ module.exports = {
           const addedToQueueEmbed = new EmbedBuilder()
             .setTitle('Added to Queue')
             .setDescription(`**${track.title || 'Unknown Title'}** by **${track.author || 'Unknown Author'}** has been added to the queue.`)
-            .setColor('Green')
+            .setcolor(color)
             .setAuthor({ name: 'Jamify', iconURL: logo })
             .setFooter({ text: footer })
             .setThumbnail('attachment://musicard.png');
@@ -135,7 +135,7 @@ module.exports = {
           .setTitle('🎶 Now Playing')
           .setAuthor({ name: 'Jamify', iconURL: logo })
           .setDescription(`**${track.title || 'Unknown Title'}** by **${track.author || 'Unknown Author'}**`)
-          .setColor('Blue')
+          .setColor(color)
           .setImage('attachment://musicard.png')
           .setFooter({ text: footer })
           .addFields(
@@ -156,7 +156,7 @@ module.exports = {
       const embed = new EmbedBuilder()
         .setTitle('❌ Error')
         .setDescription('An error occurred while trying to play the track.')
-        .setColor('Red')
+        .setcolor(color)
         .setAuthor({ name: 'Jamify', iconURL: logo })
         .setFooter({ text: footer });
       message.reply({ embeds: [embed] });

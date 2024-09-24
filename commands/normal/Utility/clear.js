@@ -8,14 +8,14 @@ module.exports = {
   execute(message, args) {
     if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
       const noPermsEmbed = new EmbedBuilder()
-        .setColor('Red')
+        .setcolor(color)
         .setDescription('You do not have permissions to manage messages.');
       return message.reply({ embeds: [noPermsEmbed] });
     }
 
     if (!args[0]) {
       const noArgsEmbed = new EmbedBuilder()
-        .setColor('Red')
+        .setcolor(color)
         .setDescription('Please specify a number of messages to delete.');
       return message.reply({ embeds: [noArgsEmbed] });
     }
@@ -23,14 +23,14 @@ module.exports = {
     const amount = parseInt(args[0]);
     if (isNaN(amount)) {
       const invalidAmountEmbed = new EmbedBuilder()
-        .setColor('Red')
+        .setcolor(color)
         .setDescription('Please specify a valid number of messages to delete.');
       return message.reply({ embeds: [invalidAmountEmbed] });
     }
 
     if (amount < 1 || amount > 100) {
       const outOfRangeEmbed = new EmbedBuilder()
-        .setColor('Red')
+        .setcolor(color)
         .setDescription('Please specify a number between 1 and 100.');
       return message.reply({ embeds: [outOfRangeEmbed] });
     }
@@ -61,14 +61,14 @@ module.exports = {
           message.channel.bulkDelete(amount, true)
             .then(deleted => {
               const successEmbed = new EmbedBuilder()
-                .setColor('Green')
+                .setcolor(color)
                 .setDescription(`Successfully deleted ${deleted.size} messages.`);
               message.channel.send({ embeds: [successEmbed] })
                 .then(msg => setTimeout(() => msg.delete(), 5000))
                 .catch(error => {
                   console.error('Error sending confirmation message:', error);
                   const errorEmbed = new EmbedBuilder()
-                    .setColor('Red')
+                    .setcolor(color)
                     .setDescription('There was an error sending the confirmation message.');
                   message.reply({ embeds: [errorEmbed] });
                 });
@@ -76,13 +76,13 @@ module.exports = {
             .catch(error => {
               if (error.code === 50013) {
                 const noBotPermsEmbed = new EmbedBuilder()
-                  .setColor('Red')
+                  .setcolor(color)
                   .setDescription('I do not have permission to delete messages in this channel.');
                 message.reply({ embeds: [noBotPermsEmbed] });
               } else {
                 console.error('Error deleting messages:', error);
                 const errorEmbed = new EmbedBuilder()
-                  .setColor('Red')
+                  .setcolor(color)
                   .setDescription('There was an error trying to delete messages in this channel.');
                 message.reply({ embeds: [errorEmbed] });
               }
@@ -90,7 +90,7 @@ module.exports = {
         } else if (i.customId === 'cancel') {
           await i.deferUpdate();
           const cancelEmbed = new EmbedBuilder()
-            .setColor('Blue')
+            .setColor(color)
             .setDescription('Message deletion canceled.');
           message.reply({ embeds: [cancelEmbed] });
         }
@@ -100,7 +100,7 @@ module.exports = {
       collector.on('end', collected => {
         if (collected.size === 0) {
           const timeoutEmbed = new EmbedBuilder()
-            .setColor('Red')
+            .setcolor(color)
             .setDescription('Confirmation timed out.');
           message.reply({ embeds: [timeoutEmbed] });
         }

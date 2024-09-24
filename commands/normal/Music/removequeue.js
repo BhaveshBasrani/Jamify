@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const Queue = require('../../../models/queue.js');
-const { banner, logo, footer } = require('../../../config.json')
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
     name: 'removequeue',
@@ -13,13 +13,13 @@ module.exports = {
             .setTitle('**No Music Playing**')
             .setImage(banner)
             .setDescription('No music is being played!')
-            .setColor('Red')
+            .setcolor(color)
             .setFooter({ text: footer, iconURL: logo});
         const validtrack = new EmbedBuilder()
             .setTitle('**Invalid Track Number**')
             .setImage(banner)
             .setDescription('Please provide a valid track number.')
-            .setColor('Red')
+            .setcolor(color)
             .setFooter({ text: footer, iconURL: logo});
         if (!queue || !queue.songs.length) {
             return message.reply({ embeds: [nomusic] });
@@ -37,7 +37,7 @@ module.exports = {
             .setTitle('**Song Removed From The Queue**')
             .setImage(banner)
             .setDescription(`${track.title} has been removed from the queue.`)
-            .setColor('Red')
+            .setcolor(color)
             .setFooter({ text: footer, iconURL: logo});
 
         message.channel.send({ embeds: [embed] });

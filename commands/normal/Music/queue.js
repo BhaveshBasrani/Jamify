@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const { useQueue } = require("discord-player");
-const { logo, banner, footer } = require('../../../config.json');
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
     name: 'queue',
@@ -35,7 +35,7 @@ module.exports = {
                 .setTitle('Current Queue')
                 .setImage(banner)
                 .setDescription(`**Currently playing:** ${currentTrack.title} - ${currentTrack.requestedBy}\n\n${limitedTracksString || 'No more songs in the queue!'}`)
-                .setColor('Green')
+                .setcolor(color)
                 .setFooter({ text: footer, iconURL: logo });
 
             message.reply({ embeds: [embed] });

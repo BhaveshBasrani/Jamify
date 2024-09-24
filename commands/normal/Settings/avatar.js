@@ -20,7 +20,7 @@ module.exports = {
                 .setTitle(`${user.username}'s Avatar`)
                 .setDescription(`[Avatar URL](${avatarURL})`)
                 .setImage(avatarURL)
-                .setColor('Red')
+                .setcolor(color)
                 .setFooter({ text: footer, iconURL: logo })
                 .setTimestamp();
 
