@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const { logo, banner, footer } = require('../../../config.json');
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
   name: 'uptime',
@@ -23,7 +23,7 @@ module.exports = {
         { name: '⏳ Minutes', value: `**${minutes}**`, inline: true },
         { name: '⏱️ Seconds', value: `**${seconds}**`, inline: true }
       )
-      .setColor('#00AAFF')
+      .setColor(color)
       .setTimestamp()
       .setThumbnail(logo)
       .setImage(banner)

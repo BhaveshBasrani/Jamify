@@ -22,7 +22,7 @@ module.exports = {
            .setTitle('Song Resumed')
            .setImage(banner)
            .setDescription('The current song has been resumed.')
-           .setcolor(color)
+           .setColor(color)
            .setFooter({ text: footer, logo});
 
         message.channel.send({ embeds: [embed] });

@@ -13,13 +13,13 @@ module.exports = {
             .setTitle('**No Music Playing**')
             .setImage(banner)
             .setDescription('No music is being played!')
-            .setcolor(color)
+            .setColor(color)
             .setFooter({ text: footer, iconURL: logo});
         const validtrack = new EmbedBuilder()
             .setTitle('**Invalid Track Number**')
             .setImage(banner)
             .setDescription('Please provide a valid track number.')
-            .setcolor(color)
+            .setColor(color)
             .setFooter({ text: footer, iconURL: logo});
         if (!queue || !queue.songs.length) {
             return message.reply({ embeds: [nomusic] });
@@ -37,7 +37,7 @@ module.exports = {
             .setTitle('**Song Removed From The Queue**')
             .setImage(banner)
             .setDescription(`${track.title} has been removed from the queue.`)
-            .setcolor(color)
+            .setColor(color)
             .setFooter({ text: footer, iconURL: logo});
 
         message.channel.send({ embeds: [embed] });

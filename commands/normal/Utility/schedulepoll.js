@@ -1,6 +1,6 @@
 const { scheduleJob } = require('node-schedule');
 const { PermissionsBitField, EmbedBuilder } = require('discord.js');
-
+const {color} = require('../../../config.json')
 module.exports = {
     name: 'schedulepoll',
     description: 'Schedule a poll for a later time.',
@@ -31,7 +31,7 @@ module.exports = {
             const pollEmbed = new EmbedBuilder()
                 .setTitle('🗳️ **Scheduled Poll**')
                 .setDescription(pollQuestion)
-                .setColor('#00FF7F')
+                .setColor(color)
                 .setThumbnail('https://example.com/logo.png') // Replace with actual logo URL
                 .setImage('https://example.com/banner.png') // Replace with actual banner URL
                 .setFooter({ text: 'Poll Footer', iconURL: 'https://example.com/logo.png' }); // Replace with actual footer text and logo URL

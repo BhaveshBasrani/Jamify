@@ -22,7 +22,7 @@ module.exports = {
                 { name: '💻 Node.js Version', value: process.version, inline: true },
                 { name: '🛠 Discord.js Version', value: require('discord.js').version, inline: true }
             )
-            .setColor('AQUA')
+            .setColor(color)
             .setImage(banner)
             .setFooter({ text: footer, iconURL: logo });
 

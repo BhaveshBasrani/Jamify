@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const { logo, footer } = require('../../../config.json');
+const { logo, footer, color } = require('../../../config.json');
 
 module.exports = {
     name: 'avatar',
@@ -20,7 +20,7 @@ module.exports = {
                 .setTitle(`${user.username}'s Avatar`)
                 .setDescription(`[Avatar URL](${avatarURL})`)
                 .setImage(avatarURL)
-                .setcolor(color)
+                .setColor(color)
                 .setFooter({ text: footer, iconURL: logo })
                 .setTimestamp();
 

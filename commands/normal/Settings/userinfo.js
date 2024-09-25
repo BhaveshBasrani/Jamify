@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const { logo, banner, footer } = require('../../../config.json');
+const { logo, footer, color, banner } = require('../../../config.json');
 
 module.exports = {
     name: 'userinfo',
@@ -11,7 +11,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle('👤 User Info')
             .setThumbnail(member.user.displayAvatarURL())
-            .setcolor(color)
+            .setColor(color)
             .setImage(banner)
             .setFooter({ text: footer, iconURL: logo });
 

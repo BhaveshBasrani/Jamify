@@ -1,5 +1,5 @@
 const { EmbedBuilder} = require('discord.js');
-const {logo, banner, website, footer} = require('../../../config.json')
+const {logo, banner, website, footer, color} = require('../../../config.json')
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 module.exports = {
@@ -8,7 +8,7 @@ module.exports = {
     aliases: ['invite', 'inviteme', 'addbot'],
     execute(message) {
         const inviteEmbed = new EmbedBuilder()
-            .setColor('#0099ff')
+            .setColor(color)
             .setTitle('<a:Invite_Me:1280034135947083826> Invite Me')
             .setDescription('<:S_BlueEvent:1280034204637335676> Click the button below to invite me to your server!')
             .setAuthor({

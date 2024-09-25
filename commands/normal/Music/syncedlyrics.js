@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const { logo, banner, footer } = require('../../../config.json');
+const { logo, footer, color, banner } = require('../../../config.json');
 const { useMainPlayer, useQueue } = require("discord-player");
 
 module.exports = {
@@ -15,7 +15,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
                     .setDescription('Player or queue is not initialized.')
-                    .setcolor(color)
+                    .setColor(color)
                     .setFooter({ text: footer, iconURL: logo });
 
                 return message.channel.send({ embeds: [errorEmbed] });
@@ -25,7 +25,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
                     .setDescription('No music is being played!')
-                    .setcolor(color)
+                    .setColor(color)
                     .setFooter({ text: footer, iconURL: logo });
 
                 return message.channel.send({ embeds: [errorEmbed] });
@@ -37,7 +37,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
                     .setDescription('No track is currently playing.')
-                    .setcolor(color)
+                    .setColor(color)
                     .setFooter({ text: footer, iconURL: logo });
 
                 return message.channel.send({ embeds: [errorEmbed] });
@@ -51,7 +51,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
                     .setDescription('No lyrics found for this song!')
-                    .setcolor(color)
+                    .setColor(color)
                     .setFooter({ text: footer, iconURL: logo });
 
                 return message.channel.send({ embeds: [errorEmbed] });
@@ -62,7 +62,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
                     .setDescription('No synced lyrics available for this song!')
-                    .setcolor(color)
+                    .setColor(color)
                     .setFooter({ text: footer, iconURL: logo });
 
                 return message.channel.send({ embeds: [errorEmbed] });
@@ -74,7 +74,7 @@ module.exports = {
                 const errorEmbed = new EmbedBuilder()
                     .setTitle('Error')
                     .setDescription('Failed to initialize synced lyrics.')
-                    .setcolor(color)
+                    .setColor(color)
                     .setFooter({ text: footer, iconURL: logo });
 
                 return message.channel.send({ embeds: [errorEmbed] });
@@ -104,7 +104,7 @@ module.exports = {
             const errorEmbed = new EmbedBuilder()
                 .setTitle('Error')
                 .setDescription('An error occurred while fetching lyrics.')
-                .setcolor(color)
+                .setColor(color)
                 .setFooter({ text: footer, iconURL: logo });
 
             return message.channel.send({ embeds: [errorEmbed] });

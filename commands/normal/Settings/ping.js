@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
-const { logo, banner, footer } = require('../../../config.json');
+const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
   name: 'ping',
@@ -12,15 +12,12 @@ module.exports = {
 
     const embed = new EmbedBuilder()
       .setTitle('🏓 Pong!')
-      .setDescription(`**Latency:** ${ping}ms 🕒\n**API Latency:** ${apiPing}ms 🌐`)
-      .setColor('Yellow')
-      .setImage(banner)
       .addFields(
-      { name: 'Server', value: message.guild.name, inline: true },
-      { name: 'Server Region', value: message.guild.region, inline: true },
-      { name: 'User', value: message.author.tag, inline: true },
-      { name: 'User ID', value: message.author.id, inline: true }
+      { name: 'Latency', value: `${ping}ms 🕒`, inline: true },
+      { name: 'API Latency', value: `${apiPing}ms 🌐`, inline: true }
       )
+      .setColor(color)
+      .setImage(banner)
       .setFooter({ text: footer, iconURL: logo })
       .setTimestamp();
 

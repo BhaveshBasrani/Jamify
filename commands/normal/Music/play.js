@@ -26,7 +26,7 @@ module.exports = {
       const embed = new EmbedBuilder()
         .setTitle('❌ Error')
         .setDescription('You need to be in a voice channel to play music! 🔊')
-        .setcolor(color)
+        .setColor(color)
         .setAuthor({ name: 'Jamify', iconURL: logo })
         .setFooter({ text: footer });
       return message.reply({ embeds: [embed] });
@@ -36,7 +36,7 @@ module.exports = {
       const embed = new EmbedBuilder()
         .setTitle('❌ Error')
         .setDescription('Player is not initialized or ready.')
-        .setcolor(color)
+        .setColor(color)
         .setAuthor({ name: 'Jamify', iconURL: logo })
         .setFooter({ text: footer });
       return message.reply({ embeds: [embed] });
@@ -52,7 +52,7 @@ module.exports = {
         const embed = new EmbedBuilder()
           .setTitle('❌ Error')
           .setDescription(`No results found for ${query}!`)
-          .setcolor(color)
+          .setColor(color)
           .setAuthor({ name: 'Jamify', iconURL: logo })
           .setFooter({ text: footer });
         return message.reply({ embeds: [embed] });
@@ -101,7 +101,7 @@ module.exports = {
           const addedToQueueEmbed = new EmbedBuilder()
             .setTitle('Added to Queue')
             .setDescription(`**${track.title || 'Unknown Title'}** by **${track.author || 'Unknown Author'}** has been added to the queue.`)
-            .setcolor(color)
+            .setColor(color)
             .setAuthor({ name: 'Jamify', iconURL: logo })
             .setFooter({ text: footer })
             .setThumbnail('attachment://musicard.png');
@@ -156,7 +156,7 @@ module.exports = {
       const embed = new EmbedBuilder()
         .setTitle('❌ Error')
         .setDescription('An error occurred while trying to play the track.')
-        .setcolor(color)
+        .setColor(color)
         .setAuthor({ name: 'Jamify', iconURL: logo })
         .setFooter({ text: footer });
       message.reply({ embeds: [embed] });

@@ -1,5 +1,5 @@
 const { PermissionsBitField, EmbedBuilder } = require('discord.js');
-const {banner, logo} = require('../../../config.json')
+const {banner, logo, color} = require('../../../config.json')
 module.exports = {
     name: 'endpoll',
     description: 'End a currently running poll and display the results.',
@@ -26,7 +26,7 @@ module.exports = {
         const resultsEmbed = new EmbedBuilder()
             .setTitle('📊 **Poll Results**')
             .setDescription(pollQuestion)
-            .setColor('#FF4500')
+            .setColor(color)
             .setThumbnail(serverIcon)
             .setImage(banner)
             .setFooter({ text: 'Poll ended', iconURL: logo });

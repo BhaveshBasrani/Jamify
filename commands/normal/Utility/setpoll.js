@@ -1,5 +1,5 @@
 const { EmbedBuilder, PermissionsBitField } = require('discord.js');
-const { logo, banner, footer } = require('../../../config.json');
+const { logo, footer, color, banner } = require('../../../config.json');
 
 module.exports = {
     name: 'setpoll',
@@ -28,7 +28,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle('🗳️ **Poll**')
             .setDescription(pollQuestion)
-            .setColor('#00FF7F')
+            .setColor(color)
             .setThumbnail(logo)
             .setImage(banner)
             .setFooter({ text: footer, iconURL: logo });

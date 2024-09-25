@@ -35,7 +35,7 @@ module.exports = {
                 .setTitle('Current Queue')
                 .setImage(banner)
                 .setDescription(`**Currently playing:** ${currentTrack.title} - ${currentTrack.requestedBy}\n\n${limitedTracksString || 'No more songs in the queue!'}`)
-                .setcolor(color)
+                .setColor(color)
                 .setFooter({ text: footer, iconURL: logo });
 
             message.reply({ embeds: [embed] });

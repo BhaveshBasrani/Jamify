@@ -1,6 +1,6 @@
-const { translate } = require('@vitalets/google-translate-api');
+const translate = require('google-translate-api-x');
 const { EmbedBuilder } = require('discord.js');
-const { footer, logo } = require('../../../config.json');
+const { footer, logo, color, banner } = require('../../../config.json');
 
 module.exports = {
   name: 'translate',
@@ -8,7 +8,6 @@ module.exports = {
   category: 'Utility',
   aliases: ['tr', 'translateText'],
   async execute(message, args) {
-    console.log('Executing command: translate');
     const lang = args[0];
     const text = args.slice(1).join(' ');
 
@@ -18,15 +17,16 @@ module.exports = {
 
     try {
       const res = await translate(text, { to: lang });
+
       const embed = new EmbedBuilder()
-        .setColor('#0099ff')
+        .setColor(color)
+        .setImage(banner)
         .setAuthor({ name: 'Jamify', iconURL: logo })
         .setTitle(`Translation to ${lang}`)
         .setDescription(res.text)
         .setFooter({ text: footer });
 
       message.channel.send({ embeds: [embed] });
-      console.log(`Translated text to ${lang}`);
     } catch (error) {
       console.error('Error translating text:', error);
       message.reply('There was an error trying to translate the text.');

@@ -1,5 +1,6 @@
 const fetch = require('node-fetch');
 const { EmbedBuilder } = require('discord.js');
+const {color, banner, logo} = require('../../../config.json')
 
 module.exports = {
     name: 'weather',
@@ -35,11 +36,14 @@ module.exports = {
 
             const weatherEmbed = new EmbedBuilder()
                 .setTitle(`Current Weather in ${location}`)
+                .setAuthor({ name: 'Jamify', iconURL: logo })
                 .addFields(
                     { name: 'Temperature', value: `${weather.temperature}°C`, inline: true },
                     { name: 'Windspeed', value: `${weather.windspeed} km/h`, inline: true }
                 )
-                .setColor('#00aaff')
+                .setColor(color)
+                .setImage(banner)
+                .setFooter({ text: footer })
                 .setTimestamp();
 
             message.channel.send({ embeds: [weatherEmbed] });

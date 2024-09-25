@@ -30,7 +30,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle('Prefix Updated')
             .setDescription(`The prefix has been updated to \`${newPrefix}\`.`)
-            .setcolor(color)
+            .setColor(color)
             .setImage(banner)
             .setFooter({ text: footer, iconURL: logo });
 

@@ -1,5 +1,5 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
-
+const {color} = require('../../../config.json')
 module.exports = {
     name: 'rate',
     description: 'Allows a user to rate another user.',
@@ -46,7 +46,7 @@ module.exports = {
             .setTitle('User Rating')
             .setDescription(`${rater.tag} rated ${ratedUser.tag}`)
             .addFields({ name: 'Rating', value: `${rating}/5` })
-            .setColor('#00FF00')
+            .setColor(color)
             .setTimestamp();
 
             // Send the embed message to the channel
