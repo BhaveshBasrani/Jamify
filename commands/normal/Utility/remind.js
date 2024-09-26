@@ -1,5 +1,5 @@
 const ms = require('ms');
-const ReminderHandler = require('../../../models/remainderHandler');
+const ReminderHandler = require('../../../handlers/remainderHandler');
 const reminderHandler = new ReminderHandler();
 
 module.exports = {

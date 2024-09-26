@@ -8,7 +8,8 @@ const path = require('path');
 const ServerSettings = require('./models/ServerSettings.js');
 const { token, mongodb, banner, logo, footer, auth } = require('./config.json');
 const commandHandler = require('./handlers/commandHandler.js');
-const afkCommand = require('./commands/normal/Fun/afk.js'); // Path to the AFK command
+const afkCommand = require('./commands/normal/Fun/afk.js'); 
+const slashafk = require('./commands/slashCommands/Fun/afk.js')
 
 const client = new Client({
     intents: [
@@ -67,11 +68,12 @@ client.player.events.on('playerFinish', async (queue, track) => {
     await playerFinishHandler.execute(queue, track, client);
 });
 
-// AFK Mention Handler - This will check all mentions across all servers
 client.on(Events.MessageCreate, async (message) => {
-    if (message.author.bot) return;  // Ignore bot messages
-    afkCommand.handleMentions(message); // Call the AFK mention handler
+    if (message.author.bot) return;
+    afkCommand.handleMentions(message);
+    slashafk.handleMentions(message);
 });
+
 
 // Connect to MongoDB
 mongoose.connect(mongodb, {
