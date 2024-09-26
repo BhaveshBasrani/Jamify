@@ -40,7 +40,7 @@ module.exports = {
 
     const homembed = new EmbedBuilder()
       .setTitle('<:Home_Page:1280034086638846003>  Home')
-      .setDescription(`**Hey ${message.author} Itz Me Jamify**\n`)
+      .setDescription(`**Hey ${message.author} Its Me Jamify**\n`)
       .setAuthor({
         name: 'Jamify',
         iconURL: logo
@@ -104,7 +104,7 @@ module.exports = {
           url: website
         })
         .setDescription(categoryCommands ? categoryCommands.split('\n').map(cmd => `<a:Blue_Arrow:1280033714100768779> ${cmd}`).join('\n') : 'No commands available')
-        .setColor(0x32CD32)
+        .setColor(color)
         .setImage(banner)
         .setFooter({ text: footer, iconURL: logo })
         .setTimestamp()
