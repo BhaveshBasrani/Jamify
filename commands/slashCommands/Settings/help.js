@@ -1,16 +1,31 @@
-const { EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder, ComponentType } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder, ComponentType } = require('discord.js');
 const { banner, logo, footer, website, color } = require('../../../config.json');
-const ServerSettings = require('../../../models/ServerSettings.js');
+const fs = require('fs');
+const path = require('path');
+
 module.exports = {
-  name: 'help',
-  description: 'Displays all the commands and details about them.',
-  category: 'Settings',
-  aliases: ['h', 'he', 'hel', 'assist', 'commands', 'cmds', 'info'],
-  async execute(message) {
-    const { commands } = message.client;
+  data: new SlashCommandBuilder()
+    .setName('help')
+    .setDescription('Displays all the commands and details about them.'),
+  async execute(interaction) {
+    const commandsDir = path.join(__dirname, '../../../commands/slashCommands');
+    const categories = fs.readdirSync(commandsDir).filter(file => fs.statSync(path.join(commandsDir, file)).isDirectory());
+
+    const commands = categories.flatMap(category => {
+      const categoryDir = path.join(commandsDir, category);
+      const commandFiles = fs.readdirSync(categoryDir).filter(file => file.endsWith('.js'));
+
+      return commandFiles.map(file => {
+        const command = require(path.join(categoryDir, file));
+        return {
+          name: command.data.name,
+          description: command.data.description,
+          category: category
+        };
+      });
+    });
 
     const uniqueCommands = [...new Set(commands.map(cmd => cmd.name))];
-    const categories = [...new Set(uniqueCommands.map(cmd => commands.find(c => c.name === cmd).category).filter(category => category))];
 
     const categoryEmojis = {
       fun: '<a:Fun_Cmds:1280033969185755247>',
@@ -40,11 +55,11 @@ module.exports = {
 
     const homembed = new EmbedBuilder()
       .setTitle('<:Home_Page:1280034086638846003>  Home')
-      .setDescription(`**Hey ${message.author} Its Me Jamify!!!**\n`)
+      .setDescription(`**Hey ${interaction.user} Its Me Jamif!!!**\n`)
       .setAuthor({
         name: 'Jamify',
         iconURL: logo
-    })
+      })
       .addFields(
         { name: '<:Categories:1287702178974273557>  **__Categories__**', value: '**> <:Fun_Help:1287708149234663435>Fun\n > <:Music_Help:1287708455901204491>Music\n > <:Mod_Help:1287731671235563625>Moderation \n> <:Settings_Help:1287734580996214850>Settings\n > <:Utils_Help:1287733750733475910>Utility**' },
         { name: '<:Links:1287701497072717836>  **__Links__**', value: `> [Dashboard](${website})` }
@@ -58,7 +73,7 @@ module.exports = {
 
     let msg;
     try {
-      msg = await message.channel.send({ embeds: [homembed], components: [row] });
+      msg = await interaction.reply({ embeds: [homembed], components: [row], fetchReply: true });
     } catch (error) {
       console.error('Error sending help menu:', error);
       return;
@@ -78,24 +93,16 @@ module.exports = {
       }
 
       const category = interaction.values[0];
-      let categoryCommands = uniqueCommands
-        .filter(cmd => {
-          const cmdObj = commands.find(c => c.name === cmd);
-          return cmdObj && cmdObj.category === category;
-        })
-        .map(cmd => `**${cmd}**: ${commands.find(c => c.name === cmd).description}`)
+      let categoryCommands = commands
+        .filter(cmd => cmd.category === category)
+        .map(cmd => `**${cmd.name}**: ${cmd.description}`)
         .join('\n');
 
       if (categoryCommands.length > 2048) {
         categoryCommands = categoryCommands.substring(0, 2045) + '...';
       }
 
-      const numberOfCommands = uniqueCommands.filter(cmd => {
-        const cmdObj = commands.find(c => c.name === cmd);
-        return cmdObj && cmdObj.category === category;
-      }).length;
-      const serverSettings = await ServerSettings.findOne({ guildId: message.guild.id });
-      const prefix = serverSettings && serverSettings.prefix ? serverSettings.prefix : require('../../../config.json').prefix;
+      const numberOfCommands = commands.filter(cmd => cmd.category === category).length;
       const categoryEmbed = new EmbedBuilder()
         .setTitle(`<:Menu:1286008459204100158>  ${category.charAt(0).toUpperCase() + category.slice(1)} Commands`)
         .setAuthor({
@@ -111,7 +118,7 @@ module.exports = {
         .addFields(
           { name: 'Category', value: category.charAt(0).toUpperCase() + category.slice(1), inline: true },
           { name: 'Number of Commands', value: `${numberOfCommands}`, inline: true },
-          { name: 'Use command', value: `${prefix}command_name to use any command`, inline: false },
+          { name: 'Use command', value: `/command_name to use any command`, inline: false },
         );
 
       await interaction.update({ embeds: [categoryEmbed] });
