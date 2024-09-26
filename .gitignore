@@ -130,5 +130,5 @@ dist
 .pnp.*
 
 # Ignore config, package-lock, and package files
-config.json
+config.js
 Jamify.zip
