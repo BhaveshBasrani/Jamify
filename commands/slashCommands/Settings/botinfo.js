@@ -1,9 +1,11 @@
 const { EmbedBuilder } = require('discord.js');
 const { logo, banner, footer, color } = require('../../../config.json');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
-    name: 'botinfo',
-    description: 'Displays detailed information about the bot.',
+    data: new SlashCommandBuilder()
+        .setName('botinfo')
+        .setDescription('Displays detailed information about the bot.'),
     async execute(interaction) {
         const { client } = interaction;
         const embed = new EmbedBuilder()

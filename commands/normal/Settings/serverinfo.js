@@ -15,7 +15,7 @@ module.exports = {
         const voiceChannels = await guild.channels.fetch().then(channels => channels.filter(channel => channel.type === ChannelType.GuildVoice).size);
 
         const embed = new EmbedBuilder()
-            .setTitle(`__<a:Info_Cmds:1286008578515271710> ${guild.name} Server Information__`)
+            .setTitle(`__<a:Info_Cmds:1286008578515271710> ${guild.name}__`)
             .setAuthor({
                 name: 'Jamify',
                 iconURL: logo,

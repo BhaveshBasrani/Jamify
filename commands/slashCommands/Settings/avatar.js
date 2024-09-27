@@ -1,9 +1,15 @@
 const { EmbedBuilder } = require('discord.js');
 const { logo, footer, color } = require('../../../config.json');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
-    name: 'avatar',
-    description: 'Shows a user\'s avatar.',
+    data: new SlashCommandBuilder()
+        .setName('avatar')
+        .setDescription('Shows a user\'s avatar.')
+        .addUserOption(option => 
+            option.setName('user')
+                .setDescription('The user to show the avatar of')
+                .setRequired(false)),
     async execute(interaction) {
         try {
             const user = interaction.options.getUser('user') || interaction.user;

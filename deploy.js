@@ -10,7 +10,11 @@ for (const folder of commandFolders) {
     const commandFiles = fs.readdirSync(path.join(__dirname, `commands/slashCommands/${folder}`)).filter(file => file.endsWith('.js'));
     for (const file of commandFiles) {
         const command = require(`./commands/slashCommands/${folder}/${file}`);
-        commands.push(command.data.toJSON());
+        if (command.data && typeof command.data.toJSON === 'function') {
+            commands.push(command.data.toJSON());
+        } else {
+            console.error(`Command at ${folder}/${file} is missing data or toJSON method.`);
+        }
     }
 }
 

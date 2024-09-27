@@ -4,7 +4,7 @@ module.exports = {
   name: 'clear',
   description: 'Deletes a specified number of messages.',
   category: 'Utility',
-  aliases: ['purge', 'clean'],
+  aliases: ['clean'],
   execute(message, args) {
     if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
       const noPermsEmbed = new EmbedBuilder()
