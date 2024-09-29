@@ -1,28 +1,19 @@
 const { EmbedBuilder } = require('discord.js');
-const { banner, logo, footer } = require('../config.json');
+const { banner, logo, footer, color } = require('../config.json');
 
 module.exports = {
     name: 'playerFinish',
     async execute(queue) {
-
-        if (queue.tracks.length > 0) {
-            queue.node.play(queue.tracks[0]);
-        } else {
-            const embed = new EmbedBuilder()
-                .setTitle('Thank You!')
-                .setDescription('Thank you for using Jamify! 🎶')
+            const thankYouEmbed = new EmbedBuilder()
+                .setTitle('Thank you for listening!')
+                .setDescription('I hope you enjoyed the music! If you have any feedback, please let me know.')
                 .setColor(color)
+                .setAuthor({ name: 'Jamify', iconURL: logo })
+                .setFooter(footer)
                 .setImage(banner)
-                .setFooter({ text: footer, iconURL: logo });
+                .setTimestamp();
 
-            if (queue.metadata.channel) {
-                await queue.metadata.channel.send({ embeds: [embed] })
-                    .catch((error) => console.error('Error sending embed:', error));
-            } else {
-                console.error('queue.metadata.channel is null or undefined');
-            }
-
-            queue.delete();
-        }
+            const channel = queue.metadata.channel; 
+            channel.send({ embeds: [thankYouEmbed] });
     },
 };

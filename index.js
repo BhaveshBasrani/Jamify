@@ -23,47 +23,52 @@ const client = new Client({
 
 client.commands = new Collection();
 client.slashCommands = new Collection();
-client.player = new Player(client, {
-   skipFFmpeg: false
+const player = new Player(client, {
+    skipFFmpeg: false
 });
 
-client.player.extractors.register(YoutubeiExtractor, {
+player.extractors.register(YoutubeiExtractor, {
     authentication: auth,
     streamOptions: {
         useClient: "ANDROID"
     }
 });
-client.player.extractors.register(SpotifyExtractor, {
+player.extractors.register(SpotifyExtractor, {
     createStream: createYoutubeiStream
 });
 
-client.player.events.on('audioTracksAdd', (queue) => {
+player.events.on('playerStart', async (queue, track) => {
+    const playerhandler = require('./handlers/playerhandler.js');
+    await playerhandler.execute(queue, track, client);
+});
+
+player.events.on('audioTracksAdd', (queue) => {
     queue.metadata.channel.send(`Multiple tracks queued`);
 });
 
-client.player.events.on('playerSkip', (queue, track) => {
+player.events.on('playerSkip', (queue, track) => {
     queue.metadata.channel.send(`Skipping **${track.title}** due to an issue!`);
 });
 
-client.player.events.on('emptyChannel', (queue) => {
+player.events.on('emptyChannel', (queue) => {
     queue.metadata.channel.send(`Leaving due to no VC activity for 5 minutes`);
 });
 
-client.player.events.on('emptyQueue', (queue) => {
+player.events.on('emptyQueue', (queue) => {
     queue.metadata.channel.send('Queue finished!');
 });
 
-client.player.events.on('error', (error) => {
+player.events.on('error', (error) => {
     console.log(`General player error event: ${error.message}`);
     console.log(error);
 });
 
-client.player.events.on('playerError', (error) => {
+player.events.on('playerError', (error) => {
     console.log(`Player error event: ${error.message}`);
     console.log(error);
 });
 
-client.player.events.on('playerFinish', async (queue, track) => {
+player.events.on('playerFinish', async (queue, track) => {
     const playerFinishHandler = require('./events/playerFinish');
     await playerFinishHandler.execute(queue, track, client);
 });

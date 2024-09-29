@@ -26,6 +26,10 @@ const queueSchema = new Schema({
   djRole: {
     type: String,
     default: null
+  },
+  autoplay: {
+    type: Boolean,
+    default: false
   }
 });
 

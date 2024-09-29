@@ -62,28 +62,32 @@ module.exports = {
 
       if (!queue) {
         try {
-            queue = player.nodes.create(message.guild, {
-                metadata: {
-                    channel: message.channel
-                }
-            });
-            await queue.connect(voiceChannel);
+          queue = player.nodes.create(message.guild, {
+            metadata: {
+              channel: message.channel
+            }
+          });
+          await queue.connect(voiceChannel);
         } catch (error) {
-            console.error(error);
-            return message.reply('Could not join your voice channel! Please make sure I have the necessary permissions.');
+          console.error(error);
+          return message.reply('Could not join your voice channel! Please make sure I have the necessary permissions.');
         }
-    }
-
-      const track = result.tracks[0];
+      }
 
       if (result.playlist) {
         queue.addTrack(result.tracks);
+        const playlistEmbed = new EmbedBuilder()
+          .setTitle('🎶 Playlist Added')
+          .setDescription(`**${result.playlist.title}** with **${result.tracks.length}** tracks has been added to the queue.`)
+          .setColor(color)
+          .setAuthor({ name: 'Jamify', iconURL: logo })
+          .setFooter({ text: footer });
+        message.reply({ embeds: [playlistEmbed] });
       } else {
+        const track = result.tracks[0];
         queue.addTrack(track);
-      }
 
-      if (queue.node.isPlaying()) {
-        (async () => {
+        if (queue.node.isPlaying()) {
           const musicard = await Dynamic({
             thumbnailImage: track.thumbnail || '',
             backgroundColor: '#070707',
@@ -110,45 +114,9 @@ module.exports = {
             embeds: [addedToQueueEmbed],
             files: [{ attachment: buffer, name: 'musicard.png' }],
           });
-        })();
-      } else {
-        queue.node.play(track);
-
-        const musicard = await ClassicPro({
-          thumbnailImage: track.thumbnail || '',
-          backgroundColor: '#070707',
-          progress: track.duration || '',
-          progressColor: '#FF7A00',
-          progressBarColor: '#5F2D00',
-          name: track.title || 'Unknown Title',
-          nameColor: '#FF7A00',
-          author: track.author || 'Unknown Author',
-          authorColor: '#696969',
-          startTime: '0:00',
-          endTime: track.duration || 'Unknown Duration',
-          timeColor: '#FF7A00',
-        });
-
-        const buffer = Buffer.from(musicard);
-
-        const nowPlayingEmbed = new EmbedBuilder()
-          .setTitle('🎶 Now Playing')
-          .setAuthor({ name: 'Jamify', iconURL: logo })
-          .setDescription(`**${track.title || 'Unknown Title'}** by **${track.author || 'Unknown Author'}**`)
-          .setColor(color)
-          .setImage('attachment://musicard.png')
-          .setFooter({ text: footer })
-          .addFields(
-            { name: '⏱ Duration', value: `${track.duration || 'Unknown Duration'}`, inline: true },
-            { name: '🙋 Requested By', value: `${message.author}`, inline: true }
-          );
-
-        const messageOptions = {
-          embeds: [nowPlayingEmbed],
-          files: [{ attachment: buffer, name: 'musicard.png' }],
-        };
-
-        message.channel.send(messageOptions);
+        } else {
+          queue.node.play();
+        }
       }
 
     } catch (error) {

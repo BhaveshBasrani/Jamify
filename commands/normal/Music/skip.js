@@ -26,7 +26,7 @@ module.exports = {
         { name: 'Skipped By', value: message.author.id, inline: true },
         { name: 'Next Song', value: queue.tracks[0] ? queue.tracks[0].title : 'None', inline: true }
       )
-      .setColor('Yellow')
+      .setColor(color)
       .setFooter({ text: footer, iconURL: logo });
 
       message.reply({ embeds: [embed] });

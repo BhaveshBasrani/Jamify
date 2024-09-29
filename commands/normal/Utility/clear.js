@@ -36,7 +36,7 @@ module.exports = {
     }
 
     const confirmEmbed = new EmbedBuilder()
-      .setColor('Yellow')
+      .setColor(color)
       .setDescription(`Are you sure you want to delete ${amount} messages?`);
 
     const row = new ActionRowBuilder()

@@ -88,7 +88,7 @@ module.exports = {
             const sentMessage = await message.channel.send({ embeds: [lyricsEmbed] });
 
             syncedLyrics.onChange(async (lyrics) => {
-                lyricsEmbed.setDescription(`[${lyrics}`);
+                lyricsEmbed.setDescription(`${lyrics}`);
                 await sentMessage.edit({ embeds: [lyricsEmbed] });
             });
             syncedLyrics.subscribe();
