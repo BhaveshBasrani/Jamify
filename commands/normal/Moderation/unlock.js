@@ -11,9 +11,8 @@ module.exports = {
             return message.reply('You do not have permissions to manage channels.');
         }
 
-        // Set the SEND_MESSAGES permission to true
-        message.channel.permissionOverwrites.create(message.guild.id, {
-            SEND_MESSAGES: true,
+        message.channel.permissionOverwrites.create(message.channel.guild.roles.everyone, {
+            SendMessages: true,
         })
             .then(() => {
             const embed = new EmbedBuilder()

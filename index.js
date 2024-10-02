@@ -43,11 +43,11 @@ player.events.on('playerStart', async (queue, track) => {
 });
 
 player.events.on('audioTracksAdd', (queue) => {
-    queue.metadata.channel.send(`Multiple tracks queued`);
+    console.log(`Multiple tracks queued`);
 });
 
 player.events.on('playerSkip', (queue, track) => {
-    queue.metadata.channel.send(`Skipping **${track.title}** due to an issue!`);
+    console.log(`Skipping **${track.title}** due to an issue!`);
 });
 
 player.events.on('emptyChannel', (queue) => {
@@ -55,7 +55,7 @@ player.events.on('emptyChannel', (queue) => {
 });
 
 player.events.on('emptyQueue', (queue) => {
-    queue.metadata.channel.send('Queue finished!');
+    console.log('Queue finished!');
 });
 
 player.events.on('error', (error) => {

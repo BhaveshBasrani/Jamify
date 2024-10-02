@@ -9,7 +9,7 @@ module.exports = {
                 .setDescription('I hope you enjoyed the music! If you have any feedback, please let me know.')
                 .setColor(color)
                 .setAuthor({ name: 'Jamify', iconURL: logo })
-                .setFooter(footer)
+                .setFooter({text: footer})
                 .setImage(banner)
                 .setTimestamp();
 

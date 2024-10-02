@@ -1,7 +1,6 @@
 const { QueryType, useQueue, useMainPlayer } = require('discord-player');
 const { EmbedBuilder } = require('discord.js');
-const { logo, banner, footer, color } = require('../../../config.json');
-const { ClassicPro, Dynamic } = require('musicard');
+const { logo, footer, color } = require('../../../config.json');
 
 module.exports = {
   name: 'play',
@@ -76,47 +75,13 @@ module.exports = {
 
       if (result.playlist) {
         queue.addTrack(result.tracks);
-        const playlistEmbed = new EmbedBuilder()
-          .setTitle('🎶 Playlist Added')
-          .setDescription(`**${result.playlist.title}** with **${result.tracks.length}** tracks has been added to the queue.`)
-          .setColor(color)
-          .setAuthor({ name: 'Jamify', iconURL: logo })
-          .setFooter({ text: footer });
-        message.reply({ embeds: [playlistEmbed] });
       } else {
         const track = result.tracks[0];
         queue.addTrack(track);
+      }
 
-        if (queue.node.isPlaying()) {
-          const musicard = await Dynamic({
-            thumbnailImage: track.thumbnail || '',
-            backgroundColor: '#070707',
-            progress: 0,
-            progressColor: '#FF7A00',
-            progressBarColor: '#5F2D00',
-            name: track.title || 'Unknown Title',
-            nameColor: '#FF7A00',
-            author: track.author || 'Unknown Author',
-            authorColor: '#696969',
-          });
-
-          const buffer = Buffer.from(musicard);
-
-          const addedToQueueEmbed = new EmbedBuilder()
-            .setTitle('Added to Queue')
-            .setDescription(`**${track.title || 'Unknown Title'}** by **${track.author || 'Unknown Author'}** has been added to the queue.`)
-            .setColor(color)
-            .setAuthor({ name: 'Jamify', iconURL: logo })
-            .setFooter({ text: footer })
-            .setThumbnail('attachment://musicard.png');
-
-          message.reply({
-            embeds: [addedToQueueEmbed],
-            files: [{ attachment: buffer, name: 'musicard.png' }],
-          });
-        } else {
-          queue.node.play();
-        }
+      if (!queue.node.isPlaying()) {
+        queue.node.play();
       }
 
     } catch (error) {

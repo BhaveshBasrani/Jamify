@@ -1,25 +1,22 @@
 const { EmbedBuilder } = require('discord.js');
-const { useQueue } = require('discord-player')
+const { useQueue } = require('discord-player');
 const { logo, banner, footer, color } = require('../../../config.json');
 
-module.exports = {
-    name: 'pause',
-    description: 'Pauses the current song.',
-    category: 'Music',
-    async execute(message) {
-        const queue = useQueue(message.guild.id);
-        if (!queue) {
-            return message.reply('I am not currently playing music in this server.');
-        }
-        queue.node.setPaused(!queue.node.isPaused());
+async function pauseMusic(message) {
+    const queue = useQueue(message.guild.id);
+    if (!queue) {
+        return message.reply('I am not currently playing music in this server.');
+    }
+    queue.node.setPaused(!queue.node.isPaused());
 
-        const embed = new EmbedBuilder()
-            .setTitle('Song Paused')
-            .setImage(banner)
-            .setDescription('The current song has been paused.')
-            .setColor(color)
-            .setFooter({ text: footer, iconURL: logo });
+    const embed = new EmbedBuilder()
+        .setTitle('Song Paused')
+        .setImage(banner)
+        .setDescription('The current song has been paused.')
+        .setColor(color)
+        .setFooter({ text: footer, iconURL: logo });
 
-        message.channel.send({ embeds: [embed] });
-    },
-};
+    message.channel.send({ embeds: [embed] });
+}
+
+module.exports = pauseMusic;

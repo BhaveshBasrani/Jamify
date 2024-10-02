@@ -5,7 +5,7 @@ module.exports = {
   name: 'ping',
   description: 'Checks the bot\'s latency and provides additional information.',
   category: 'Settings',
-  aliases: ['p', 'pin', 'pi', 'latency', 'pong', 'lag'],
+  aliases: [ 'pin', 'pi', 'latency', 'pong', 'lag'],
   async execute(message) {
     const ping = Date.now() - message.createdTimestamp;
     const apiPing = message.client.ws.ping;
