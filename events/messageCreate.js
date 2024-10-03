@@ -15,7 +15,7 @@ module.exports = {
         // Check if the message counter is divisible by 4
         if (messageCounter % 4 === 0) {
             const adEmbed = new MessageEmbed()
-                .setTitle('Advertisement')
+                .setTitle('**__Advertisement__**')
                 .setDescription('This is an ad. This Helps Us Maintain Run Jamify Check out the best hosting server!')
                 .setColor(color)
                 .setImage(adbanner)
