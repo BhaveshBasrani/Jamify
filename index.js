@@ -5,12 +5,12 @@ const { SpotifyExtractor } = require('@discord-player/extractor');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
+const { joinVoiceChannel } = require('@discordjs/voice');
 const ServerSettings = require('./models/ServerSettings.js');
 const { token, mongodb, banner, logo, footer, auth, color } = require('./config.json');
 const commandHandler = require('./handlers/commandHandler.js');
 const afkCommand = require('./commands/normal/Fun/afk.js'); 
-const slashafk = require('./commands/slashCommands/Fun/afk.js')
-
+const slashafk = require('./commands/slashCommands/Fun/afk.js');
 
 const client = new Client({
     intents: [
@@ -85,6 +85,24 @@ client.on(Events.MessageCreate, async (message) => {
     slashafk.handleMentions(message);
 });
 
+// Function to join voice channels for guilds with 24/7 mode enabled
+async function joinVoiceChannelsFor247() {
+    const serverSettings = await ServerSettings.find({ twentyFourSeven: true });
+    for (const settings of serverSettings) {
+        const guild = client.guilds.cache.get(settings.guildId);
+        if (guild) {
+            const voiceChannel = guild.channels.cache.get(settings.voiceChannelId);
+            if (voiceChannel) {
+                joinVoiceChannel({
+                    channelId: voiceChannel.id,
+                    guildId: guild.id,
+                    adapterCreator: guild.voiceAdapterCreator,
+                });
+                console.log(`Joined voice channel ${voiceChannel.name} in guild ${guild.name} for 24/7 mode.`);
+            }
+        }
+    }
+}
 
 // Connect to MongoDB
 mongoose.connect(mongodb, {
@@ -145,6 +163,11 @@ client.on('messageCreate', async (message) => {
 
         message.channel.send({ embeds: [embed] });
     }
+});
+
+client.once('ready', async () => {
+    console.log(`Logged in as ${client.user.tag}!`);
+    await joinVoiceChannelsFor247();
 });
 
 client.login(token);
