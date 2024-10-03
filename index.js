@@ -51,7 +51,12 @@ player.events.on('playerSkip', (queue, track) => {
     console.log(`Skipping **${track.title}** due to an issue!`);
 });
 
-player.events.on('emptyChannel', (queue) => {
+player.events.on('emptyChannel', async (queue) => {
+    const serverSettings = await ServerSettings.findOne({ guildId: queue.guild.id });
+    if (serverSettings && serverSettings.twentyFourSeven) {
+        console.log('24/7 mode is enabled, not leaving the channel.');
+        return;
+    }
     queue.metadata.channel.send(`Leaving due to no VC activity for 5 minutes`);
 });
 
