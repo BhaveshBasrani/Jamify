@@ -6,10 +6,11 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
 const ServerSettings = require('./models/ServerSettings.js');
-const { token, mongodb, banner, logo, footer, auth } = require('./config.json');
+const { token, mongodb, banner, logo, footer, auth, color } = require('./config.json');
 const commandHandler = require('./handlers/commandHandler.js');
 const afkCommand = require('./commands/normal/Fun/afk.js'); 
 const slashafk = require('./commands/slashCommands/Fun/afk.js')
+
 
 const client = new Client({
     intents: [
@@ -17,7 +18,7 @@ const client = new Client({
         GatewayIntentBits.GuildVoiceStates,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildMembers // Add this to handle member-related events like mentions.
+        GatewayIntentBits.GuildMembers 
     ]
 });
 
@@ -139,10 +140,6 @@ client.on('messageCreate', async (message) => {
 
         message.channel.send({ embeds: [embed] });
     }
-});
-
-client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
 });
 
 client.login(token);
