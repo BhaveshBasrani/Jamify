@@ -1,14 +1,12 @@
 const { Client, GatewayIntentBits, Collection, EmbedBuilder, Events } = require('discord.js');
 const { Player } = require('discord-player');
-const { YoutubeiExtractor, createYoutubeiStream } = require("discord-player-youtubei");
-const { SpotifyExtractor } = require('@discord-player/extractor');
+const { YoutubeiExtractor } = require("discord-player-youtubei");
+const { SpotifyExtractor, AppleMusicExtractor, SoundCloudExtractor } = require('@discord-player/extractor');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
-const { joinVoiceChannel } = require('@discordjs/voice');
 const ServerSettings = require('./models/ServerSettings.js');
 const { token, mongodb, banner, logo, footer, auth, color } = require('./config.json');
-const commandHandler = require('./handlers/commandHandler.js');
 const afkCommand = require('./commands/normal/Fun/afk.js'); 
 const slashafk = require('./commands/slashCommands/Fun/afk.js');
 
@@ -25,22 +23,21 @@ const client = new Client({
 client.commands = new Collection();
 client.slashCommands = new Collection();
 const player = new Player(client, {
-    skipFFmpeg: false
+    skipFFmpeg: false,
+    streamOptions: {
+        highWaterMark: 1 << 26,
+    }
 });
 
 player.extractors.register(YoutubeiExtractor, {
     authentication: auth,
-    streamOptions: {
-        useClient: "ANDROID"
-    }
-});
-player.extractors.register(SpotifyExtractor, {
-    createStream: createYoutubeiStream
 });
 
+player.extractors.register(SpotifyExtractor, {});
+
+const playerhandler = require('./handlers/playerhandler.js');
 player.events.on('playerStart', async (queue, track) => {
-    const playerhandler = require('./handlers/playerhandler.js');
-    await playerhandler.execute(queue, track, client);
+        await playerhandler.execute(queue, track, client)
 });
 
 player.events.on('audioTracksAdd', (queue) => {
@@ -56,16 +53,17 @@ player.events.on('emptyChannel', async (queue) => {
     if (serverSettings && serverSettings.twentyFourSeven) {
         console.log('24/7 mode is enabled, not leaving the channel.');
         return;
-    }
+    } else {
     queue.metadata.channel.send(`Leaving due to no VC activity for 5 minutes`);
+    } 
 });
 
 player.events.on('emptyQueue', (queue) => {
     console.log('Queue finished!');
 });
 
-player.events.on('error', (error) => {
-    console.log(`General player error event: ${error.message}`);
+player.events.on('error', (queue, error) => {
+    console.log(`General player error event from the queue ${queue.guild.id}: ${error.message}`);
     console.log(error);
 });
 
@@ -73,9 +71,8 @@ player.events.on('playerError', (error) => {
     console.log(`Player error event: ${error.message}`);
     console.log(error);
 });
-
+const playerFinishHandler = require('./events/playerFinish');
 player.events.on('playerFinish', async (queue, track) => {
-    const playerFinishHandler = require('./events/playerFinish');
     await playerFinishHandler.execute(queue, track, client);
 });
 
@@ -85,21 +82,29 @@ client.on(Events.MessageCreate, async (message) => {
     slashafk.handleMentions(message);
 });
 
-// Function to join voice channels for guilds with 24/7 mode enabled
 async function joinVoiceChannelsFor247() {
     const serverSettings = await ServerSettings.find({ twentyFourSeven: true });
     for (const settings of serverSettings) {
-        const guild = client.guilds.cache.get(settings.guildId);
-        if (guild) {
-            const voiceChannel = guild.channels.cache.get(settings.voiceChannelId);
+        try {
+            const guild = await client.guilds.fetch(settings.guildId);
+            const voiceChannel = await guild.channels.fetch(settings.voiceChannelId);
             if (voiceChannel) {
-                joinVoiceChannel({
-                    channelId: voiceChannel.id,
-                    guildId: guild.id,
-                    adapterCreator: guild.voiceAdapterCreator,
-                });
-                console.log(`Joined voice channel ${voiceChannel.name} in guild ${guild.name} for 24/7 mode.`);
+                try {
+                    const queue = player.nodes.create(guild, {
+                        metadata: {
+                            channel: voiceChannel
+                        }
+                    });
+                    await queue.connect(voiceChannel);
+                    console.log(`Joined voice channel ${voiceChannel.name} in guild ${guild.name} for 24/7 mode.`);
+                } catch (error) {
+                    console.error(`Failed to join voice channel ${voiceChannel.name} in guild ${guild.name}:`, error);
+                }
+            } else {
+                console.log(`Voice channel with ID ${settings.voiceChannelId || 'undefined'} not found in guild ${guild.name}.`);
             }
+        } catch (error) {
+            console.error(`Failed to fetch guild or voice channel for guild ID ${settings.guildId}:`, error);
         }
     }
 }
@@ -156,7 +161,7 @@ client.on('messageCreate', async (message) => {
     if (message.content.toLowerCase() === `<@${client.user.id}>` || message.content.toLowerCase() === `<@!${client.user.id}>`) {
         const embed = new EmbedBuilder()
             .setTitle('Heyy!!! Am Jamify')
-            .setDescription(`My prefix in this server is \`${prefix}\`. Use ${prefix}help for more info.`)
+            .setDescription(`My prefix in this server is \`${prefix}\`. Use \`${prefix}help\` for more info.`)
             .setColor(color)
             .setImage(banner)
             .setFooter({ text: footer, iconURL: logo });
@@ -165,8 +170,9 @@ client.on('messageCreate', async (message) => {
     }
 });
 
+console.log(player.scanDeps());player.on('debug',console.log).events.on('debug',(_,m)=>console.log(m));
+
 client.once('ready', async () => {
-    console.log(`Logged in as ${client.user.tag}!`);
     await joinVoiceChannelsFor247();
 });
 

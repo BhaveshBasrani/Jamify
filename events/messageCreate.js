@@ -1,6 +1,6 @@
 const ServerSettings = require('../models/ServerSettings');
-const { EmbedBuilder } = require('discord.js');
-const {adbanner, color, logo, footer} = require('../config.json')
+const { EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } = require('discord.js');
+const { adbanner, color, logo, footer, adLink } = require('../config.json');
 
 let messageCounter = 0;
 
@@ -12,16 +12,23 @@ module.exports = {
         // Increment the message counter
         messageCounter++;
 
-        // Check if the message counter is divisible by 4
-        if (messageCounter % 4 === 0) {
-            const adEmbed = new MessageEmbed()
+        // Check if the message counter is divisible by 10 (less frequent)
+        if (messageCounter % 10 === 0) {
+            const adEmbed = new EmbedBuilder()
                 .setTitle('**__Advertisement__**')
                 .setDescription('This is an ad. This Helps Us Maintain Run Jamify Check out the best hosting server!')
                 .setColor(color)
                 .setImage(adbanner)
-                .setFooter({text: footer , iconURL: logo})
+                .setFooter({ text: footer, iconURL: logo });
 
-            const adMessage = await message.channel.send({ embeds: [adEmbed] });
+            const adButton = new ButtonBuilder()
+                .setLabel('Visit Ad Server')
+                .setStyle(ButtonStyle.Link)
+                .setURL(adLink);
+
+            const row = new ActionRowBuilder().addComponents(adButton);
+
+            const adMessage = await message.channel.send({ embeds: [adEmbed], components: [row] });
 
             // Delete the ad message after 10 seconds
             setTimeout(() => adMessage.delete(), 10000);

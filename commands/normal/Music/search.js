@@ -6,22 +6,46 @@ module.exports = {
     name: 'search',
     description: 'Searches for a song.',
     category: 'Music',
-    aliases: ['sear', 'ser' , 'se'],
+    aliases: ['sear', 'ser', 'se'],
     async execute(message, args) {
         const player = useMainPlayer();
         const query = args.join(' ');
-        
+
         if (!query) {
-            return message.reply('Please provide a song to search for.');
+            const embed = new EmbedBuilder()
+                .setTitle('❌ Error')
+                .setDescription('Please provide a song to search for.')
+                .setColor(color)
+                .setAuthor({ name: 'Jamify', iconURL: logo })
+                .setFooter({ text: footer });
+            return message.reply({ embeds: [embed] });
         }
 
-        const result = await player.search(query, {
-            requestedBy: message.author,
-            searchEngine: QueryType.SPOTIFY_SEARCH,
-        });
+        let result;
+        try {
+            result = await player.search(query, {
+                requestedBy: message.author,
+                searchEngine: QueryType.SPOTIFY_SEARCH,
+            });
+        } catch (error) {
+            console.error('Error in search command:', error);
+            const embed = new EmbedBuilder()
+                .setTitle('❌ Error')
+                .setDescription('An error occurred while searching for the song.')
+                .setColor(color)
+                .setAuthor({ name: 'Jamify', iconURL: logo })
+                .setFooter({ text: footer });
+            return message.reply({ embeds: [embed] });
+        }
 
         if (!result || !result.tracks.length) {
-            return message.reply(`No results found for ${query}!`);
+            const embed = new EmbedBuilder()
+                .setTitle('❌ Error')
+                .setDescription(`No results found for ${query}!`)
+                .setColor(color)
+                .setAuthor({ name: 'Jamify', iconURL: logo })
+                .setFooter({ text: footer });
+            return message.reply({ embeds: [embed] });
         }
 
         const tracks = result.tracks.slice(0, 5);
@@ -44,21 +68,21 @@ module.exports = {
             .setDescription(tracks.map((track, index) => `${index + 1}. ${track.title}`).join('\n'))
             .setColor(color)
             .setImage(banner)
-            .setFooter({ text: footer, iconURL: logo});
+            .setFooter({ text: footer, iconURL: logo });
 
         const msg = await message.channel.send({ embeds: [embed], components: [row] });
 
-        const filter = i => i.customId === 'select-track' && i.user.id === message.author.id  ;
+        const filter = i => i.customId === 'select-track' && i.user.id === message.author.id;
         const collector = msg.createMessageComponentCollector({ filter, time: 60000 });
 
         collector.on('collect', async i => {
-            await i.deferReply(); // Defer the reply to give more time
-        
+            await i.deferReply();
+
             const trackIndex = parseInt(i.values[0]);
             const track = tracks[trackIndex];
-        
+
             let queue = player.nodes.get(message.guild.id);
-        
+
             if (!queue) {
                 try {
                     queue = player.nodes.create(message.guild, {
@@ -68,32 +92,28 @@ module.exports = {
                     });
                     await queue.connect(message.member.voice.channel);
                 } catch (error) {
-                    console.error(error);
-                    return message.reply('Could not join your voice channel! Please make sure I have the necessary permissions.');
+                    console.error('Error in search command:', error);
+                    const embed = new EmbedBuilder()
+                        .setTitle('❌ Error')
+                        .setDescription('Could not join your voice channel! Please make sure I have the necessary permissions.')
+                        .setColor(color)
+                        .setAuthor({ name: 'Jamify', iconURL: logo })
+                        .setFooter({ text: footer });
+                    return message.reply({ embeds: [embed] });
                 }
             }
-        
-            queue.addTrack(track);
-        
-            if (!queue.isPlaying()) {
-                await queue.play(track); // Play the track
+
+            if(result.hasPlaylist()) {
+                queue.addTrack(result.playlist);
+            } else {
+                queue.addTrack(track)
             }
-        
-            const nowPlayingEmbed = new EmbedBuilder()
-            .setTitle('Now Playing')
-            .setAuthor({ name: 'Jamify', iconURL: logo })
-            .setDescription(`**${track.title}** by **${track.author}**`)
-            .setColor(color)
-            .setThumbnail(track.thumbnail)
-            .setImage(banner)
-            .setFooter({ text: footer })
-            .addFields(
-              { name: 'Duration', value: `${track.duration}`, inline: true },
-              { name: 'Search Query', value: `${query}`, inline: true },
-              { name: 'Requested By', value: `@${message.author.tag}`, inline: true }
-            );
-        
-            await i.editReply({ embeds: [nowPlayingEmbed], components: [] }); // Update after selection
+
+            if (!queue.isPlaying()) {
+                await queue.node.play();
+            }
+
+            await i.editReply({ content: `**${track.title}** by **${track.author}** is now playing!`, components: [] });
         });
     }
 };

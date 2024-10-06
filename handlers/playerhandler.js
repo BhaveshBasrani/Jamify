@@ -1,4 +1,4 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
 const { logo, footer, color } = require('../config.json');
 const canvafy = require('canvafy');
 const pauseMusic = require('../commands/normal/Music/pause');
@@ -38,107 +38,101 @@ module.exports = {
                 .setFooter({ text: footer, iconURL: logo })
                 .setTimestamp();
 
-            const controlButtons = new ActionRowBuilder()
+            const selectMenu = new ActionRowBuilder()
                 .addComponents(
-                    new ButtonBuilder()
-                        .setCustomId('pause')
-                        .setLabel('Pause')
-                        .setStyle(ButtonStyle.Primary),
-                    new ButtonBuilder()
-                        .setCustomId('stop')
-                        .setLabel('Stop')
-                        .setStyle(ButtonStyle.Danger),
-                    new ButtonBuilder()
-                        .setCustomId('skip')
-                        .setLabel('Skip')
-                        .setStyle(ButtonStyle.Secondary)
-                );
-
-            const queueButtons = new ActionRowBuilder()
-                .addComponents(
-                    new ButtonBuilder()
-                        .setCustomId('queue')
-                        .setLabel('Queue')
-                        .setStyle(ButtonStyle.Secondary),
-                    new ButtonBuilder()
-                        .setCustomId('lyrics')
-                        .setLabel('Lyrics')
-                        .setStyle(ButtonStyle.Secondary)
-                );
-
-            const extraButtons = new ActionRowBuilder()
-                .addComponents(
-                    new ButtonBuilder()
-                        .setCustomId('shuffle')
-                        .setLabel('Shuffle')
-                        .setStyle(ButtonStyle.Secondary),
-                    new ButtonBuilder()
-                        .setCustomId('repeat')
-                        .setLabel('Repeat')
-                        .setStyle(ButtonStyle.Secondary),
-                    new ButtonBuilder()
-                        .setCustomId('autoplay')
-                        .setLabel('Autoplay')
-                        .setStyle(ButtonStyle.Secondary)
+                    new StringSelectMenuBuilder()
+                        .setCustomId('music_controls')
+                        .setPlaceholder('🎵 Select an action')
+                        .addOptions([
+                            {
+                                label: '⏸️ Pause',
+                                description: 'Pause the music',
+                                value: 'pause',
+                            },
+                            {
+                                label: '▶️ Resume',
+                                description: 'Resume the music',
+                                value: 'resume',
+                            },
+                            {
+                                label: '⏹️ Stop',
+                                description: 'Stop the music',
+                                value: 'stop',
+                            },
+                            {
+                                label: '⏭️ Skip',
+                                description: 'Skip the current song',
+                                value: 'skip',
+                            },
+                            {
+                                label: '📜 Queue',
+                                description: 'Display the queue',
+                                value: 'queue',
+                            },
+                            {
+                                label: '🎤 Lyrics',
+                                description: 'Fetch synced lyrics',
+                                value: 'lyrics',
+                            },
+                            {
+                                label: '🔀 Shuffle',
+                                description: 'Shuffle the queue',
+                                value: 'shuffle',
+                            },
+                            {
+                                label: '🔁 Repeat',
+                                description: 'Repeat the current song',
+                                value: 'repeat',
+                            },
+                            {
+                                label: '🔄 Autoplay',
+                                description: 'Toggle autoplay',
+                                value: 'autoplay',
+                            }
+                        ])
                 );
 
             const messageOptions = {
                 embeds: [nowPlayingEmbed],
                 files: [{ attachment: buffer, name: 'spotify.png' }],
-                components: [controlButtons, queueButtons, extraButtons]
+                components: [selectMenu]
             };
 
             const sentMessage = await queue.metadata.channel.send(messageOptions);
-
-            let isPaused = false;
 
             const filter = i => i.user.id === track.requestedBy.id;
             const collector = sentMessage.createMessageComponentCollector({ filter, time: track.durationMS });
 
             collector.on('collect', async i => {
                 try {
-                    await i.deferUpdate(); // Acknowledge the interaction promptly
-            
-                    if (i.customId === 'pause') {
-                        if (isPaused) {
-                            await resumeMusic(i);
-                            const button = i.message.components[0].components.find(btn => btn.customId === 'pause');
-                            button.setLabel('Pause');
-                            controlButtons.components.forEach(button => button.setDisabled(false));
-                            queueButtons.components.forEach(button => button.setDisabled(false));
-                            extraButtons.components.forEach(button => button.setDisabled(false));
-                        } else {
-                            await pauseMusic(i);
-                            const button = i.message.components[0].components.find(btn => btn.customId === 'pause');
-                            button.setLabel('Resume');
-                            i.component.setLabel('Resume');
-                            controlButtons.components.forEach(button => button.setDisabled(true));
-                            queueButtons.components.forEach(button => button.setDisabled(true));
-                            extraButtons.components.forEach(button => button.setDisabled(true));
-                        }
-                        isPaused = !isPaused;
-                    } else if (i.customId === 'stop') {
+                    if (!i.deferred && !i.replied) {
+                        await i.deferUpdate(); // Acknowledge the interaction promptly
+                    }
+
+                    const selectedValue = i.values[0];
+
+                    if (selectedValue === 'pause') {
+                        await pauseMusic(i);
+                    } else if (selectedValue === 'resume') {
+                        await resumeMusic(i);
+                    } else if (selectedValue === 'stop') {
                         await stopMusic(i);
                         await sentMessage.delete(); // Delete the embed message
-                    } else if (i.customId === 'queue') {
+                    } else if (selectedValue === 'queue') {
                         await displayQueue(i);
-                    } else if (i.customId === 'lyrics') {
+                    } else if (selectedValue === 'lyrics') {
                         await fetchSyncedLyrics(i);
-                    } else if (i.customId === 'skip') {
+                    } else if (selectedValue === 'skip') {
                         skipSong(i);
-                    } else if (i.customId === 'shuffle') {
+                    } else if (selectedValue === 'shuffle') {
                         shuffle(i);
-                    } else if (i.customId === 'repeat') {
+                    } else if (selectedValue === 'repeat') {
                         await repeat(i);
-                    } else if (i.customId === 'autoplay') {
+                    } else if (selectedValue === 'autoplay') {
                         await toggleAutoplay(i);
                     }
-                    // Only update the message if the interaction has not been replied to
-                    if (!i.replied && !i.deferred) {
-                        await i.update({ components: [controlButtons, queueButtons, extraButtons] });
-                    }
                 } catch (error) {
-                    console.error('Error handling button interaction:', error);
+                    console.error('Error handling select menu interaction:', error);
                     if (!i.replied && !i.deferred) {
                         await i.followUp({ content: 'There was an error handling your request.', ephemeral: true });
                     }
@@ -153,7 +147,7 @@ module.exports = {
                     console.error('Error deleting the embed message:', error);
                 }
             });
-            
+
         } catch (error) {
             console.error('Error executing playerhandler:', error);
         }

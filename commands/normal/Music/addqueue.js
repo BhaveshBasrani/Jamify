@@ -12,12 +12,24 @@ module.exports = {
         const query = args.join(' ');
 
         if (!query) {
-            return message.reply('Please provide a song to add to the queue.');
+            const embed = new EmbedBuilder()
+                .setTitle('❌ Error')
+                .setDescription('Please provide a song to add to the queue.')
+                .setColor(color)
+                .setAuthor({ name: 'Jamify', iconURL: logo })
+                .setFooter({ text: footer });
+            return message.reply({ embeds: [embed] });
         }
 
         const queue = useQueue(message.guild.id);
         if (!queue) {
-            return message.reply('No queue found for this guild.');
+            const embed = new EmbedBuilder()
+                .setTitle('❌ Error')
+                .setDescription('No queue found for this guild.')
+                .setColor(color)
+                .setAuthor({ name: 'Jamify', iconURL: logo })
+                .setFooter({ text: footer });
+            return message.reply({ embeds: [embed] });
         }
 
         let result;
@@ -27,26 +39,33 @@ module.exports = {
                 searchEngine: QueryType.SPOTIFY_SEARCH,
             });
         } catch (error) {
-            console.error(error);
-            return message.reply('An error occurred while searching for the song.');
+            console.error('Error in addqueue command:', error);
+            const embed = new EmbedBuilder()
+                .setTitle('❌ Error')
+                .setDescription('An error occurred while searching for the song.')
+                .setColor(color)
+                .setAuthor({ name: 'Jamify', iconURL: logo })
+                .setFooter({ text: footer });
+            return message.reply({ embeds: [embed] });
         }
 
         if (!result || !result.tracks.length) {
-            return message.reply(`No results found for ${query}!`);
+            const embed = new EmbedBuilder()
+                .setTitle('❌ Error')
+                .setDescription(`No results found for ${query}!`)
+                .setColor(color)
+                .setAuthor({ name: 'Jamify', iconURL: logo })
+                .setFooter({ text: footer });
+            return message.reply({ embeds: [embed] });
         }
 
         const track = result.tracks[0];
-        const song = {
-            title: track.title,
-            url: track.url,
-            thumbnail: track.thumbnail,
-            duration: track.duration,
-            requestedBy: message.author.username,
-            channelId: message.channel.id,
-            voiceChannelId: message.member.voice.channel.id
-        };
-
-        queue.addTrack(track);
+        
+        if(result.hasPlaylist()) {
+            queue.addTrack(result.playlist);
+        } else {
+            queue.addTrack(track)
+        }
 
         const embed = new EmbedBuilder()
             .setTitle('Song Added to Queue')
@@ -65,7 +84,7 @@ module.exports = {
                 },
                 {
                     name: '**Requested By**',
-                    value: `${song.requestedBy}`,
+                    value: `${message.author.username}`,
                     inline: true,
                 }
             )

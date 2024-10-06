@@ -17,13 +17,12 @@ module.exports = {
             .setColor(color)
             .setFooter({ text: footer, iconURL: logo });
 
-        if (!queue || !queue.songs.length) {
+        if (!queue) {
             return message.reply({ embeds: [nomusic] });
         }
 
         const currentSong = queue.songs[0];
 
-        // New code snippet
         const spotify = await new canvafy.Spotify()
             .setAuthor(currentSong.author)
             .setAlbum(currentSong.album || 'Unknown Album')

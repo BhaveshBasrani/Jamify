@@ -1,7 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
 const { joinVoiceChannel, getVoiceConnection } = require('@discordjs/voice');
 const { logo, banner, footer, color } = require('../../../config.json');
-const ServerSettings = require('../../models/ServerSettings.js'); // Add this line
+const ServerSettings = require('../../../models/ServerSettings');
 
 module.exports = {
     name: '247',
@@ -19,9 +19,11 @@ module.exports = {
             return message.reply({ embeds: [noVoiceChannel] });
         }
 
-        const serverSettings = await ServerSettings.findOne({ guildId: message.guild.id });
+        let serverSettings = await ServerSettings.findOne({ guildId: message.guild.id });
+        if (!serverSettings) {
+            serverSettings = new ServerSettings({ guildId: message.guild.id, twentyFourSeven: false });
+        }
         serverSettings.twentyFourSeven = !serverSettings.twentyFourSeven;
-        await serverSettings.save();
 
         const voiceChannel = message.member.voice.channel;
         const guildId = message.guild.id;
@@ -29,6 +31,9 @@ module.exports = {
         const adapterCreator = message.guild.voiceAdapterCreator;
 
         if (serverSettings.twentyFourSeven) {
+            serverSettings.voiceChannelId = channelId; // Save the voice channel ID
+            await serverSettings.save();
+
             try {
                 const connection = joinVoiceChannel({
                     channelId,
@@ -58,6 +63,9 @@ module.exports = {
                 message.reply('There was an error connecting to the voice channel.');
             }
         } else {
+            serverSettings.voiceChannelId = null; // Clear the voice channel ID
+            await serverSettings.save();
+
             const leaveEmbed = new EmbedBuilder()
                 .setTitle('**Leaving Voice Channel**')
                 .setImage(banner)
