@@ -170,7 +170,7 @@ client.on('messageCreate', async (message) => {
     }
 });
 
-console.log(player.scanDeps());player.on('debug',console.log).events.on('debug',(_,m)=>console.log(m));
+// console.log(player.scanDeps());player.on('debug',console.log).events.on('debug',(_,m)=>console.log(m));
 
 client.once('ready', async () => {
     await joinVoiceChannelsFor247();

@@ -73,33 +73,43 @@ module.exports = {
 
         const serverSettings = await ServerSettings.findOne({ guildId: message.guild.id });
 
+        if (!message.member.voice.channel) {
+            const embed = new EmbedBuilder()
+            .setTitle('❌ Error')
+            .setDescription('You need to be in a voice channel to play music.')
+            .setColor(color)
+            .setAuthor({ name: 'Jamify', iconURL: logo })
+            .setFooter({ text: footer });
+            return message.reply({ embeds: [embed] });
+        }
+
         if (serverSettings && serverSettings.twentyFourSeven) {
             const voiceChannel = message.guild.channels.cache.get(serverSettings.voiceChannelId);
             if (voiceChannel && message.member.voice.channel.id !== voiceChannel.id) {
-                const embed = new EmbedBuilder()
-                    .setTitle('❌ Error')
-                    .setDescription(`24/7 mode is enabled. Please join ${voiceChannel.name}.`)
-                    .setColor(color)
-                    .setAuthor({ name: 'Jamify', iconURL: logo })
-                    .setFooter({ text: footer });
-                return message.reply({ embeds: [embed] });
+            const embed = new EmbedBuilder()
+                .setTitle('❌ Error')
+                .setDescription(`24/7 mode is enabled. Please join ${voiceChannel.name}.`)
+                .setColor(color)
+                .setAuthor({ name: 'Jamify', iconURL: logo })
+                .setFooter({ text: footer });
+            return message.reply({ embeds: [embed] });
             } else if (voiceChannel && message.member.voice.channel.id === voiceChannel.id) {
-                if (!queue.connection) {
-                    queue.connect(voiceChannel);
-                }
+            if (!queue.connection) {
+                queue.connect(voiceChannel);
+            }
             }
         } else {
             const voiceChannel = message.member.voice.channel;
             if (voiceChannel) {
-                queue.connect(voiceChannel);
+            queue.connect(voiceChannel);
             } else {
-                const embed = new EmbedBuilder()
-                    .setTitle('❌ Error')
-                    .setDescription('You need to be in a voice channel to play music.')
-                    .setColor(color)
-                    .setAuthor({ name: 'Jamify', iconURL: logo })
-                    .setFooter({ text: footer });
-                return message.reply({ embeds: [embed] });
+            const embed = new EmbedBuilder()
+                .setTitle('❌ Error')
+                .setDescription('You need to be in a voice channel to play music.')
+                .setColor(color)
+                .setAuthor({ name: 'Jamify', iconURL: logo })
+                .setFooter({ text: footer });
+            return message.reply({ embeds: [embed] });
             }
         }
 

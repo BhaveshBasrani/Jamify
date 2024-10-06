@@ -1,5 +1,5 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
-const {color} = require('../../../config.json')
+const { color } = require('../../../config.json')
 module.exports = {
     name: 'rate',
     description: 'Allows a user to rate another user.',
