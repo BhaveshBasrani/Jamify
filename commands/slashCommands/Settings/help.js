@@ -55,7 +55,7 @@ module.exports = {
 
     const homembed = new EmbedBuilder()
       .setTitle('<:Home_Page:1280034086638846003>  Home')
-      .setDescription(`**Hey ${interaction.user} Its Me Jamif!!!**\n`)
+      .setDescription(`**Hey ${interaction.user} Its Me Jamify!!!**\n`)
       .setAuthor({
         name: 'Jamify',
         iconURL: logo

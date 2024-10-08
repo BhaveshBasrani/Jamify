@@ -31,7 +31,7 @@ module.exports = {
         );
 
         // Send the buttons to the channel
-        const ratingMessage = await message.channel.send({ content: 'Rate the user by clicking on the stars:', components: [starButtons] });
+        const ratingMessage = await message.channel.send({ content: `Rate the ${ratedUser} by clicking on the stars:`, components: [starButtons] });
 
         // Create a message collector to handle button interactions
         const filter = (interaction) => interaction.isButton() && interaction.message.id === ratingMessage.id && interaction.user.id === rater.id;
@@ -39,26 +39,20 @@ module.exports = {
 
         collector.on('collect', async (interaction) => {
             const rating = parseInt(interaction.customId.split('_')[1]);
-            await interaction.update({ content: `You rated ${ratedUser.tag} ${rating}/5 stars!`, components: [] });
-
-            // Create an embed message for a better visual presentation
             const embed = new EmbedBuilder()
             .setTitle('User Rating')
-            .setDescription(`${rater.tag} rated ${ratedUser.tag}`)
+            .setDescription(`${rater} rated ${ratedUser}`)
             .addFields({ name: 'Rating', value: `${rating}/5` })
             .setColor(color)
             .setTimestamp();
+            await interaction.update({ embeds: [embed], components: [] });
 
-            // Send the embed message to the channel
-            await message.channel.send({ embeds: [embed] });
-
-            console.log(`${rater.tag} rated ${ratedUser.tag} ${rating}/5 stars`);
+            console.log(`${rater.displayName} rated ${ratedUser.displayName} ${rating}/5 stars`);
         });
 
         collector.on('end', (collected) => {
-            if (collected.size === 0) {
-                ratingMessage.edit({ content: 'Rating timed out.', components: [] });
-            }
+    ratingMessage.edit({ content: 'Rating has now timed out.', components: [] });
+            
         });
 
     },

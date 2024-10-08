@@ -20,7 +20,7 @@ module.exports = {
             }
 
             const embed = new EmbedBuilder()
-                .setTitle(`${user.username}'s Avatar`)
+                .setTitle(`${user.username.displayName}'s Avatar`)
                 .setDescription(`[Avatar URL](${avatarURL})`)
                 .setImage(avatarURL)
                 .setColor(color)

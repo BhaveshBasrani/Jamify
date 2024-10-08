@@ -74,7 +74,7 @@ module.exports = {
             .addFields(
                 {
                     name: '**Position in Queue**',
-                    value: `${queue.tracks.toArray().indexOf(track) + 1} of ${queue.tracks.size()}`,
+                    value: `${queue.tracks.toArray().indexOf(track) + 1} of ${queue.tracks.length}`,
                     inline: true,
                 },
                 {

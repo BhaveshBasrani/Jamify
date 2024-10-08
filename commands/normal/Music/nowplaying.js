@@ -21,7 +21,7 @@ module.exports = {
             return message.reply({ embeds: [nomusic] });
         }
 
-        const currentSong = queue.songs[0];
+        const currentSong = queue.currentTrack;
 
         const spotify = await new canvafy.Spotify()
             .setAuthor(currentSong.author)

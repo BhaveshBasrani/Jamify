@@ -1,5 +1,6 @@
 const { EmbedBuilder, PermissionsBitField, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
 const { logo, banner, footer, color } = require('../../../config.json');
+const ServerSettings = require('../../../models/ServerSettings.js');
 
 module.exports = {
     name: 'assignrole',
@@ -20,7 +21,6 @@ module.exports = {
             let roleId = args[i];
             const emoji = args[i + 1];
 
-            // Check if the argument is a role mention
             const roleMentionMatch = roleId.match(/^<@&(\d+)>$/);
             if (roleMentionMatch) {
                 roleId = roleMentionMatch[1];
@@ -38,7 +38,7 @@ module.exports = {
         }
 
         const embed = new EmbedBuilder()
-            .setTitle('Select a role from the menu below!')
+            .setTitle('Select Your Favorite Roles From The Menu Below!')
             .setImage(banner)
             .setDescription(roleEmojiPairs.map(pair => `<a:Blue_Arrow:1280033714100768779> <@&${pair.role.id}> - ${pair.emoji} `).join('\n'))
             .setColor(color)
@@ -58,29 +58,41 @@ module.exports = {
                     .addOptions(options)
             );
 
-        const msg = await message.channel.send({ embeds: [embed], components: [row] });
+            const msg = await message.channel.send({ embeds: [embed], components: [row] });
 
-        const filter = interaction => interaction.customId === 'select-role' && !interaction.user.bot;
-        const collector = msg.createMessageComponentCollector({ filter });
-
-        collector.on('collect', async interaction => {
-            const roleId = interaction.values[0];
-            const role = await message.guild.roles.fetch(roleId);
-            const member = message.guild.members.cache.get(interaction.user.id);
-
-            if (!role || !member) return;
-
-            try {
-                await member.roles.add(role);
-                await interaction.reply({ content: `You have been given the role <@&${role.id}>.`, ephemeral: true });
-            } catch (error) {
-                console.error('Error adding role:', error);
-                await interaction.reply({ content: 'There was an error while assigning the role. Please try again later.', ephemeral: true });
-            }
-        });
-
-        collector.on('end', () => {
-            console.log('Role selection collector has ended.');
-        });
+            await ServerSettings.findOneAndUpdate(
+                { guildId: message.guild.id },
+                { roleMessageId: msg.id, roleChannelId: message.channel.id, roleEmojiPairs },  // Save channel ID
+                { upsert: true }
+            );
+            
+            startRoleCollector(msg, roleEmojiPairs);
+            
     },
 };
+
+async function startRoleCollector(msg, roleEmojiPairs) {
+    const filter = interaction => interaction.customId === 'select-role' && !interaction.user.bot;
+    const collector = msg.createMessageComponentCollector({ filter });
+
+    collector.on('collect', async interaction => {
+        const roleId = interaction.values[0];
+        const role = await msg.guild.roles.fetch(roleId);
+        const member = msg.guild.members.cache.get(interaction.user.id);
+
+        if (!role || !member) return;
+
+        try {
+            await member.roles.add(role);
+            await interaction.reply({ content: `You have been given the role <@&${role.id}>.`, ephemeral: true });
+        } catch (error) {
+            console.error('Error adding role:', error);
+            await interaction.reply({ content: 'There was an error while assigning the role. Please try again later.', ephemeral: true });
+        }
+    });
+
+    collector.on('end', collected => {
+        console.log('Role selection collector has ended. Restarting collector...');
+        startRoleCollector(msg, roleEmojiPairs);
+    });
+}
