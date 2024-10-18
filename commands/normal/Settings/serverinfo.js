@@ -15,11 +15,7 @@ module.exports = {
         const voiceChannels = await guild.channels.fetch().then(channels => channels.filter(channel => channel.type === ChannelType.GuildVoice).size);
 
         const embed = new EmbedBuilder()
-            .setTitle(`__<a:Info_Cmds:1286008578515271710> ${guild.name}__`)
-            .setAuthor({
-                name: 'Jamify',
-                iconURL: logo,
-            })
+            .setDescription(`# __<a:Info_Cmds:1286008578515271710> ${guild.name}__`)
             .setThumbnail(guild.iconURL({ dynamic: true, size: 1024 }))
             .addFields(
             { name: '<:People:1288116021743456347>  **__Members__**', value: `> **${guild.memberCount.toLocaleString()}**`, inline: false },
@@ -34,9 +30,12 @@ module.exports = {
             { name: '<:Boost:1288117445411868712>  **__Boost Level__**', value: `**> ${guild.premiumTier}**`, inline: false }
             )
             .setColor(color)
-            .setImage(banner)
             .setFooter({ text: footer, iconURL: logo })
             .setTimestamp();
+
+        if (guild.bannerURL()) {
+            embed.setImage(guild.bannerURL({ dynamic: true, size: 1024 }));
+        }
 
         message.channel.send({ embeds: [embed] });
     },

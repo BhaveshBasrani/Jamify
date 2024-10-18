@@ -34,8 +34,8 @@ module.exports = {
             const nowPlayingEmbed = new EmbedBuilder()
                 .setTitle('<a:Music_Cmds:1280034171431026749> Now Playing')
                 .setDescription(`**${track.title}** By **${track.author}** \n
-                   > <a:BlueBulllet:1290900684618596382> __**Duration:**__ ${track.duration || 'Unknown Duration'} \n
-                   > <a:BlueBulllet:1290900684618596382> __**Requested By:**__ <@${track.requestedBy}>`)
+                   > <a:BlueBulllet:1290900684618596382> __**Duration:**__ ${track.duration || 'Unknown Duration'}
+                     <a:BlueBulllet:1290900684618596382> __**Requested By:**__ <@${track.requestedBy}>`)
                 .setColor(color)
                 .setImage('attachment://spotify.png')
                 .setFooter({ text: footer, iconURL: logo })
@@ -91,7 +91,7 @@ module.exports = {
                         await resumeMusic(i);
                     } else if (selectedValue === 'stop') {
                         await stopMusic(i);
-                        await sentMessage.delete(); // Delete the embed message
+                        await sentMessage.delete();
                     } else if (selectedValue === 'queue') {
                         await displayQueue(i);
                     } else if (selectedValue === 'lyrics') {
