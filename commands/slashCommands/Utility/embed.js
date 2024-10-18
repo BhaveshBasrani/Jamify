@@ -2,79 +2,77 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const { color } = require('../../../config.json');
 
-module.exports = {
-    data: new SlashCommandBuilder()
-        .setName('embed')
-        .setDescription('Embeds any text. (don\'t use external emojis or they won\'t work!)'),
+const data = new SlashCommandBuilder()
+    .setName('embed')
+    .setDescription('Embeds any text. (don\'t use external emojis or they won\'t work!)');
 
-    async execute(interaction) {
-        const modal = new ModalBuilder()
-            .setCustomId('embedModal')
-            .setTitle('Embed Text Input');
+async function execute(interaction) {
+    const confirmationEmbed = new EmbedBuilder()
+        .setDescription('Are you sure you want to create an embed?')
+        .setColor(color);
 
-        const textInput = new TextInputBuilder()
-            .setCustomId('embedText')
-            .setLabel('Text to Embed')
-            .setStyle(TextInputStyle.Paragraph)
-            .setRequired(true);
+    const confirmButton = new ButtonBuilder()
+        .setCustomId('confirm')
+        .setLabel('Confirm')
+        .setStyle(ButtonStyle.Primary);
 
-        const actionRow = new ActionRowBuilder().addComponents(textInput);
-        modal.addComponents(actionRow);
+    const cancelButton = new ButtonBuilder()
+        .setCustomId('cancel')
+        .setLabel('Cancel')
+        .setStyle(ButtonStyle.Secondary);
 
-        await interaction.showModal(modal);
+    const row = new ActionRowBuilder().addComponents(confirmButton, cancelButton);
 
-        const filter = i => i.customId === 'embedModal' && i.user.id === interaction.user.id;
-        const collector = interaction.channel.createMessageComponentCollector({ filter, componentType: ComponentType.ModalSubmit, time: 15000 });
+    await interaction.reply({ embeds: [confirmationEmbed], components: [row] });
 
-        collector.on('collect', async i => {
-            const text = i.fields.getTextInputValue('embedText');
+    const buttonFilter = btn => btn.user.id === interaction.user.id;
+    const buttonCollector = interaction.channel.createMessageComponentCollector({ filter: buttonFilter, componentType: ComponentType.Button, time: 15000 });
 
-            const confirmationEmbed = new EmbedBuilder()
-                .setDescription('Are you sure you want to send this embed?')
-                .setColor(color);
+    buttonCollector.on('collect', async btn => {
+        if (btn.customId === 'confirm') {
+            const modal = new ModalBuilder()
+                .setCustomId('embedModal')
+                .setTitle('Embed Text Input');
 
-            const confirmButton = new ButtonBuilder()
-                .setCustomId('confirm')
-                .setLabel('Confirm')
-                .setStyle(ButtonStyle.Primary);
+            const textInput = new TextInputBuilder()
+                .setCustomId('embedText')
+                .setLabel('Text to Embed')
+                .setStyle(TextInputStyle.Paragraph)
+                .setRequired(true);
 
-            const cancelButton = new ButtonBuilder()
-                .setCustomId('cancel')
-                .setLabel('Cancel')
-                .setStyle(ButtonStyle.Secondary);
+            const actionRow = new ActionRowBuilder().addComponents(textInput);
+            modal.addComponents(actionRow);
 
-            const row = new ActionRowBuilder()
-                .addComponents(confirmButton, cancelButton);
+            await btn.showModal(modal);
 
-            await i.reply({ embeds: [confirmationEmbed], components: [row] });
+            try {
+                const modalInteraction = await btn.awaitModalSubmit({ time: 60000 });
+                if (modalInteraction) {
+                    const text = modalInteraction.fields.getTextInputValue('embedText');
 
-            const buttonFilter = btn => btn.user.id === interaction.user.id;
-            const buttonCollector = i.channel.createMessageComponentCollector({ buttonFilter, componentType: ComponentType.Button, time: 15000 });
-
-            buttonCollector.on('collect', async btn => {
-                if (btn.customId === 'confirm') {
-                    const embed = new EmbedBuilder()
+                    const finalEmbed = new EmbedBuilder()
                         .setDescription(text)
-                        .setColor(color);
+                        .setColor(color)
 
-                    await interaction.channel.send({ embeds: [embed] });
-                    await btn.update({ content: 'Embed sent!', components: [] });
-                } else if (btn.customId === 'cancel') {
-                    await btn.update({ content: 'Embed creation cancelled.', components: [] });
+                    await modalInteraction.reply({ embeds: [finalEmbed], fetchReply: true });
                 }
-            });
-
-            buttonCollector.on('end', collected => {
-                if (collected.size === 0) {
-                    i.editReply({ content: 'No response, embed creation cancelled.', components: [] });
-                }
-            });
-        });
-
-        collector.on('end', collected => {
-            if (collected.size === 0) {
-                interaction.editReply({ content: 'No response, embed creation cancelled.', components: [] });
+            } catch (error) {
+                console.error('An unexpected error occurred:', error);
             }
-        });
-    }
-};
+        } else if (btn.customId === 'cancel') {
+            await btn.update({ content: 'Embed creation cancelled.', components: [] });
+        }
+    });
+
+    buttonCollector.on('end', async collected => {
+        if (collected.size === 0) {
+            try {
+                await interaction.editReply({ content: 'No response, embed creation cancelled.', components: [] });
+            } catch (error) {
+                console.error('Failed to edit reply:', error);
+            }
+        }
+    });
+}
+
+module.exports = { data, execute };
