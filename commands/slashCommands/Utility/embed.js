@@ -23,7 +23,7 @@ async function execute(interaction) {
 
     const row = new ActionRowBuilder().addComponents(confirmButton, cancelButton);
 
-    await interaction.reply({ embeds: [confirmationEmbed], components: [row] });
+    const confirmationMessage = await interaction.reply({ embeds: [confirmationEmbed], components: [row], fetchReply: true });
 
     const buttonFilter = btn => btn.user.id === interaction.user.id;
     const buttonCollector = interaction.channel.createMessageComponentCollector({ filter: buttonFilter, componentType: ComponentType.Button, time: 15000 });
@@ -52,15 +52,18 @@ async function execute(interaction) {
 
                     const finalEmbed = new EmbedBuilder()
                         .setDescription(text)
-                        .setColor(color)
+                        .setColor(color);
 
-                    await modalInteraction.reply({ embeds: [finalEmbed], fetchReply: true });
+                    await modalInteraction.reply({ content: 'Embed created successfully!', ephemeral: true });
+                    await interaction.channel.send({ embeds: [finalEmbed] });
+                    await confirmationMessage.delete();
                 }
             } catch (error) {
                 console.error('An unexpected error occurred:', error);
             }
         } else if (btn.customId === 'cancel') {
             await btn.update({ content: 'Embed creation cancelled.', components: [] });
+            await confirmationMessage.delete();
         }
     });
 
@@ -68,6 +71,7 @@ async function execute(interaction) {
         if (collected.size === 0) {
             try {
                 await interaction.editReply({ content: 'No response, embed creation cancelled.', components: [] });
+                await confirmationMessage.delete();
             } catch (error) {
                 console.error('Failed to edit reply:', error);
             }

@@ -65,13 +65,13 @@ player.events.on('emptyQueue', () => {
 });
 
 player.events.on('error', (queue, error) => {
-    console.log(`General player error event from the queue ${queue.guild.id}: ${error.message}`);
-    console.log(error);
+    console.error(`General player error event from the queue ${queue.guild.id}: ${error.message}`);
+    console.error(error);
 });
 
 player.events.on('playerError', (error) => {
-    console.log(`Player error event: ${error.message}`);
-    console.log(error);
+    console.error(`Player error event: ${error.message}`);
+    console.error(error);
 });
 
 const playerFinishHandler = require('./events/playerFinish');
@@ -107,7 +107,7 @@ async function startRoleCollector(msg, roleEmojiPairs) {
         }
     });
 
-    collector.on('end', collected => {
+    collector.on('end', () => {
         console.log('Role selection collector has ended. Restarting collector...');
         startRoleCollector(msg, roleEmojiPairs);
     });
@@ -207,7 +207,10 @@ client.on('messageCreate', async (message) => {
 client.once('ready', async () => {
     client.setMaxListeners(50);
     await reattachRoleCollectors();
+    console.log(player.scanDeps());player.on('debug',console.log).events.on('debug',(_,m)=>console.log(m));
 });
 
 // Bot Login
-client.login(token);
+client.login(token).catch(error => {
+    console.error('Failed to login:', error);
+});

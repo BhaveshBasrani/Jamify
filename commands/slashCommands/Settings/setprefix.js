@@ -3,9 +3,13 @@ const ServerSettings = require('../../../models/ServerSettings.js');
 const { logo, banner, footer, color } = require('../../../config.json');
 
 module.exports = {
-    data: new SlashCommandBuilder() 
-    .setName('setprefix')
-    .setDescription('Sets a custom prefix for the server.'),
+    data: new SlashCommandBuilder()
+        .setName('setprefix')
+        .setDescription('Sets a custom prefix for the server.')
+        .addStringOption(option => 
+            option.setName('prefix')
+                .setDescription('The new prefix for the server')
+                .setRequired(true)),
     async execute(interaction) {
         // Check if the user has administrator permissions
         if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
