@@ -24,6 +24,7 @@
     "got": "^14.4.2",
     "inflight": "^1.0.6",
     "install": "^0.13.0",
+    "ip": "^2.0.1",
     "mediaplex": "^0.0.9",
     "mongoose": "^8.7.0",
     "musicard": "^2.0.5",

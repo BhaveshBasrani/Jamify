@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionsBitField, EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionsBitField, EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const TicketSetup = require('../../../models/Ticket.js');
 const { color } = require('../../../config.json')
 
@@ -208,11 +208,122 @@ module.exports = {
                     .setCustomId('closeTicket')
                     .setLabel('Close')
                     .setStyle(ButtonStyle.Danger);
+                    const buttonFilter = (i) => ['claimTicket', 'closeTicket'].includes(i.customId);
+                    const buttonCollector = channel.createMessageComponentCollector({ filter: buttonFilter });
+
+                    buttonCollector.on('collect', async (i) => {
+                        if (i.customId === 'claimTicket') {
+                            const claimedEmbed = new EmbedBuilder()
+                                .setColor(color)
+                                .setDescription(`## Hey ${interaction.user}! ${i.user} has claimed your ticket!`);
+
+                            await i.reply({ embeds: [claimedEmbed] });
+                        } else if (i.customId === 'closeTicket') {
+                            if (!i.member.roles.cache.has(ticketSetup.adminRoleId)) {
+                                return i.reply({ content: 'Only admins can close the ticket.', ephemeral: true });
+                            }
+
+                            await i.reply({ content: 'This ticket will be closed.', ephemeral: true });
+                            await channel.delete();
+                        }
+                    });
+
+                    // Keep the collector running indefinitely
+                    buttonCollector.on('end', (_, reason) => {
+                        if (reason !== 'channelDelete') {
+                            buttonCollector.resetTimer();
+                        }
+                    });
+
+                    channel.on('deleted', () => {
+                        buttonCollector.stop('channelDelete');
+                    });
+
+                    // Handle the close ticket reason modal
+                    const closeTicketReasonModal = new ModalBuilder()
+                        .setCustomId('closeTicketReasonModal')
+                        .setTitle('Close Ticket Reason');
+
+                    const reasonInput = new TextInputBuilder()
+                        .setCustomId('reasonInput')
+                        .setLabel('Reason for closing the ticket')
+                        .setStyle(TextInputStyle.Paragraph)
+                        .setRequired(true);
+
+                    closeTicketReasonModal.addComponents(
+                        new ActionRowBuilder().addComponents(reasonInput)
+                    );
+
+                    const closeTicketFilter = (i) => i.customId === 'closeTicketReasonModal' && i.user.id === interaction.user.id;
+
+                    buttonCollector.on('collect', async (i) => {
+                        if (i.customId === 'claimTicket') {
+                            const claimedEmbed = new EmbedBuilder()
+                                .setColor(color)
+                                .setDescription(`## Hey ${interaction.user}! ${i.user} has claimed your ticket!`);
+
+                            await i.reply({ embeds: [claimedEmbed] });
+                        } else if (i.customId === 'closeTicket') {
+                            if (!i.member.roles.cache.has(ticketSetup.adminRoleId)) {
+                                return i.reply({ content: 'Only admins can close the ticket.', ephemeral: true });
+                            }
+
+                            await i.showModal(closeTicketReasonModal);
+
+                            i.awaitModalSubmit({ filter: closeTicketFilter, time: 60000 })
+                                .then(async (modalInteraction) => {
+                                    const reason = modalInteraction.fields.getTextInputValue('reasonInput');
+
+                                    const closedEmbed = new EmbedBuilder()
+                                        .setColor(color)
+                                        .setDescription(`## Ticket Closed! \n__**Reason:**__ ${reason}`);
+
+                                    await modalInteraction.reply({ embeds: [closedEmbed], ephemeral: true });
+
+                                    const notifyEmbed = new EmbedBuilder()
+                                        .setColor(color)
+                                        .setDescription(`## Your ticket has been closed for the following reason: \n__**Reason:**__ ${reason}`);
+
+                                    await interaction.user.send({ embeds: [notifyEmbed] });
+                                    await i.user.send({ embeds: [notifyEmbed] });
+
+                                    await channel.delete();
+                                })
+                                .catch(err => {
+                                    console.error(err);
+                                    const timeoutEmbed = new EmbedBuilder()
+                                        .setColor(color)
+                                        .setDescription('## Modal Timed Out');
+                                    i.followUp({ embeds: [timeoutEmbed], ephemeral: true });
+                                });
+                        }
+                    });
+                    const createTranscript = async (channel) => {
+                        const messages = await channel.messages.fetch({ limit: 100 });
+                        const transcript = messages.map(m => `${m.author.tag}: ${m.content}`).reverse().join('\n');
+                        return transcript;
+                    };
+
+                    buttonCollector.on('end', async (_, reason) => {
+                        if (reason !== 'channelDelete') {
+                            buttonCollector.resetTimer();
+                        } else {
+                            const transcript = await createTranscript(channel);
+                            const transcriptEmbed = new EmbedBuilder()
+                                .setColor(color)
+                                .setTitle('Ticket Transcript')
+                                .setDescription(`Transcript for ticket ${channel.name}`)
+                                .setFooter({ text: 'Footer text' });
+
+                            await interaction.user.send({ embeds: [transcriptEmbed], files: [{ attachment: Buffer.from(transcript, 'utf-8'), name: `${channel.name}_transcript.txt` }] });
+                            await i.user.send({ embeds: [transcriptEmbed], files: [{ attachment: Buffer.from(transcript, 'utf-8'), name: `${channel.name}_transcript.txt` }] });
+                        }
+                    });
 
                 const actionRow = new ActionRowBuilder()
                     .addComponents(claimButton, closeButton);
 
-                await channel.send(`${interaction.user} | ${ticketSetup.adminRoleId}`);
+                await channel.send(`${interaction.user} | <@${ticketSetup.adminRoleId}>`);
                 await channel.send({ embeds: [managementPanelEmbed], components: [actionRow] });
                 });
 

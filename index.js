@@ -1,7 +1,7 @@
 const { Client, GatewayIntentBits, Collection, EmbedBuilder, Events, ChannelType } = require('discord.js');
 const { Player } = require('discord-player');
-const { YoutubeiExtractor } = require("discord-player-youtubei");
-const { SpotifyExtractor } = require('@discord-player/extractor');
+// const { YoutubeiExtractor } = require("discord-player-youtubei");
+const { SpotifyExtractor, BridgeProvider, BridgeSource, SoundCloudExtractor } = require('@discord-player/extractor');
 const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
@@ -24,22 +24,27 @@ const client = new Client({
 // Initialize Player and Commands
 client.commands = new Collection();
 client.slashCommands = new Collection();
+const bridgeProvider = new BridgeProvider(BridgeSource.SoundCloud);
 const player = new Player(client, {
+    ipconfig: {
+        blocks: ['fa25::/48', '2001:2::/48', '203.0.113.0/24', '198.51.100.0/24'] // upgraded ip blocks
+    },
     skipFFmpeg: false,
     streamOptions: {
         highWaterMark: 1 << 26,
-    }
+    },
+    bridgeProvider
 });
 
 // Register Extractors
-player.extractors.register(YoutubeiExtractor, { authentication: auth });
+// player.extractors.register(YoutubeiExtractor, { authentication: auth });
 player.extractors.register(SpotifyExtractor, {});
+player.extractors.register(SoundCloudExtractor, {});
 
 // Player Event Handlers
 const playerhandler = require('./handlers/playerhandler.js');
 player.events.on('playerStart', async (queue, track) => {
     await playerhandler.execute(queue, track, client);
-    console.log("working.")
 });
 
 player.events.on('audioTracksAdd', () => {
@@ -50,15 +55,6 @@ player.events.on('playerSkip', (_, track) => {
     console.log(`Skipping **${track.title}** due to an issue!`);
 });
 
-player.events.on('emptyChannel', async (queue) => {
-    const serverSettings = await ServerSettings.findOne({ guildId: queue.guild.id });
-    if (serverSettings && serverSettings.twentyFourSeven) {
-        console.log('24/7 mode is enabled, not leaving the channel.');
-        return;
-    } else {
-        queue.metadata.channel.send(`Leaving due to no VC activity for 5 minutes`);
-    }
-});
 
 player.events.on('emptyQueue', () => {
     console.log('Queue finished!');
@@ -193,11 +189,18 @@ client.on('messageCreate', async (message) => {
 
     if (message.content.toLowerCase() === `<@${client.user.id}>` || message.content.toLowerCase() === `<@!${client.user.id}>`) {
         const embed = new EmbedBuilder()
-            .setTitle('Heyy!!! Am Jamify')
-            .setDescription(`My prefix in this server is \`${prefix}\`. Use \`${prefix}help\` for more info.`)
+            .setTitle('🎵 Hey there! I\'m Jamify 🎵')
+            .setDescription(`My prefix here is \`${prefix}\`. Use \`${prefix}help\` to see what I can do for you!`)
             .setColor(color)
+            .setThumbnail(logo)
+            .addFields(
+            { name: 'Prefix', value: `\`${prefix}\``, inline: true },
+            { name: 'Help Command', value: `\`${prefix}help\``, inline: true },
+            { name: 'Enjoy the Music!', value: '🎶🎧🎶' }
+            )
             .setImage(banner)
-            .setFooter({ text: footer, iconURL: logo });
+            .setFooter({ text: footer, iconURL: logo })
+            .setTimestamp();
 
         message.channel.send({ embeds: [embed] });
     }
@@ -207,7 +210,7 @@ client.on('messageCreate', async (message) => {
 client.once('ready', async () => {
     client.setMaxListeners(50);
     await reattachRoleCollectors();
-    console.log(player.scanDeps());player.on('debug',console.log).events.on('debug',(_,m)=>console.log(m));
+   // console.log(player.scanDeps());player.on('debug',console.log).events.on('debug',(_,m)=>console.log(m));
 });
 
 // Bot Login
